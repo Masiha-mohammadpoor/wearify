@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { FaStar } from "react-icons/fa6";
 import { BiCartAdd } from "react-icons/bi";
+import { BiDollar } from "react-icons/bi";
 
 const ProductCard = () => {
   return (
@@ -21,7 +22,7 @@ const ProductCard = () => {
         </div>
         <h3 className="mt-3 text-[16px]">Ferrari Design T-shirt</h3>
         <div className="mt-4 w-full flex justify-between items-center pb-1">
-          <span className="font-semibold text-lg">$25</span>
+          <span className="font-semibold text-lg flex items-center gap-x-0.5"><BiDollar className="text-red-900"/> 25</span>
           <button className="bg-red-900 py-1 px-1.5 rounded-xl text-white text-sm cursor-pointer flex items-center justify-center gap-x-1">
             Add to Cart <BiCartAdd className="text-lg mb-0.75" />
           </button>
