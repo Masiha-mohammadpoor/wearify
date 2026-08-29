@@ -5,7 +5,7 @@ import { BiDollar } from "react-icons/bi";
 
 const ProductCard = () => {
   return (
-    <article className="col-span-3 rounded-xl p-2 bg-[#F5F0EB]">
+    <article className="col-span-3 rounded-xl p-2 bg-[#f4ece4]">
       <div className="relative w-full h-44 rounded-xl overflow-hidden">
         <Image alt="product" src="/images.jpeg" fill className="object-cover" />
       </div>
@@ -22,9 +22,11 @@ const ProductCard = () => {
         </div>
         <h3 className="mt-3 text-[16px]">Ferrari Design T-shirt</h3>
         <div className="mt-4 w-full flex justify-between items-center pb-1">
-          <span className="font-semibold text-lg flex items-center gap-x-0.5"><BiDollar className="text-red-900"/> 25</span>
+          <span className="font-semibold text-lg flex items-center gap-x-0.5">
+            <BiDollar className="text-red-900" /> 25
+          </span>
           <button className="bg-red-900 py-1 px-1.5 rounded-xl text-white text-sm cursor-pointer flex items-center justify-center gap-x-1">
-            Add to Cart <BiCartAdd className="text-lg mb-0.75" />
+            Add To Cart <BiCartAdd className="text-lg mb-0.75" />
           </button>
         </div>
       </div>

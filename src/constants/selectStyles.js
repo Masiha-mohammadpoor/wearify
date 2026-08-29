@@ -16,7 +16,7 @@ export const selectStyles = {
   }),
   control: (baseStyles, state) => ({
     ...baseStyles,
-    backgroundColor: "#e4e8ed",
+    backgroundColor: "#f4ece4",
     display: "flex",
     borderRadius: "0.5rem",
     padding: "0.2rem 0",
@@ -37,18 +37,18 @@ export const selectStyles = {
   menu: (baseStyles, state) => ({
     ...baseStyles,
     color: "#495057",
-    backgroundColor: "#e4e8ed",
+    backgroundColor: "#f4ece4",
     maxHeight: "130px",
     overflowY: "auto",
     backdropFilter: "blur(16px)",
     position: "absolute",
-    zIndex: 60,
+    zIndex: 40,
   }),
   option: (baseStyles, state) => ({
     ...baseStyles,
-    backgroundColor: state.isSelected ? "#a2a7ab" : "transparent",
+    backgroundColor: state.isSelected ? "#d8cabc" : "transparent",
     "&:hover": {
-      backgroundColor: "#a2a7ab",
+      backgroundColor: "#d8cabc",
       color: "white",
       backdropFilter: "blur(16px)",
     },
