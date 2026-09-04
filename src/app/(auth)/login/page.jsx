@@ -28,13 +28,8 @@ const Login = () => {
         </Link>
         <h2 className="text-5xl font-semibold mb-10">Login</h2>
         <form className="flex flex-col gap-y-3 w-4/5">
-          <AuthInput name="email" label="email" placeholder="email" />
-          <PasswordInput
-            name="password"
-            label="password"
-            type="password"
-            placeholder="password"
-          />
+          <AuthInput name="email" placeholder="email" />
+          <PasswordInput name="password" placeholder="password" />
           <button className="w-full rounded-full text-white text-lg font-semibold bg-red-900 py-2 cursor-pointer hover:bg-red-950 transition-all duration-300">
             login to your account
           </button>
