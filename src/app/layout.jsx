@@ -1,8 +1,8 @@
-import { Rubik } from "next/font/google";
+import { Comfortaa } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 
-const rubik = Rubik({
+const comfortaa = Comfortaa({
   subsets: ["latin"],
 });
 
@@ -13,9 +13,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${rubik.className} antialiased h-full`}>
+    <html lang="en" className={`${comfortaa.className} antialiased h-full`}>
       <body className="min-h-full flex flex-col bg-[#FDF8F6]">
-        <Header />
+        {/* <Header /> */}
         {children}
       </body>
     </html>
