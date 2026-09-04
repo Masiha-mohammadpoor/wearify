@@ -1,11 +1,45 @@
+"use client";
 import AuthInput from "@/components/AuthInput";
 import PasswordInput from "@/components/PasswordInput";
 import Image from "next/image";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { HiHome } from "react-icons/hi";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup
+  .object({
+    email: yup
+      .string()
+      .required("email is required")
+      .email("please enter a valid email"),
+    password: yup
+      .string()
+      .required("password is required")
+      .min(6, "password must be at least 6 characters"),
+  })
+  .required();
 
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isDirty, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    resolver: yupResolver(schema),
+    mode: "onTouched",
+  });
+
+  const onSubmit = async (data) => {
+    console.log(data);
+  };
+
   return (
     <main className="overflow-hidden flex justify-between items-center h-screen bg-[#f4ece4]">
       <section
@@ -27,10 +61,26 @@ const Login = () => {
           <HiHome className="text-red-900 text-2xl" />
         </Link>
         <h2 className="text-5xl font-semibold mb-10">Login</h2>
-        <form className="flex flex-col gap-y-3 w-4/5">
-          <AuthInput name="email" placeholder="email" />
-          <PasswordInput name="password" placeholder="password" />
-          <button className="w-full rounded-full text-white text-lg font-semibold bg-red-900 py-2 cursor-pointer hover:bg-red-950 transition-all duration-300">
+        <form
+          className="flex flex-col gap-y-1 w-4/5"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <AuthInput
+            name="email"
+            placeholder="email"
+            register={register}
+            errors={errors}
+          />
+          <PasswordInput
+            name="password"
+            placeholder="password"
+            register={register}
+            errors={errors}
+          />
+          <button
+            disabled={!isValid || !isDirty || isSubmitting}
+            className="w-full rounded-full text-white text-lg font-semibold bg-red-900 py-2 cursor-pointer hover:bg-red-950 transition-all duration-300 disabled:cursor-not-allowed disabled:bg-red-900 disabled:opacity-45"
+          >
             login to your account
           </button>
         </form>
