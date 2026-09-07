@@ -1,10 +1,10 @@
 const AuthInput = ({ type = "text", name, placeholder, register, errors }) => {
   return (
-    <div className="flex flex-col pb-3 w-full">
+    <div className="flex flex-col w-full">
       <input
         {...register(name)}
         id={name}
-        className="border-0 outline-0 py-2.5 px-5 rounded-full w-full bg-white"
+        className="border-0 outline-0 py-2.5 px-5 rounded-full w-full bg-white mb-0.75"
         type={type}
         placeholder={placeholder}
         autoComplete="off"

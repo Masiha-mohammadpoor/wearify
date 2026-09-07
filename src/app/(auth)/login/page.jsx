@@ -1,6 +1,6 @@
 "use client";
+import { useState, useEffect, useRef } from "react";
 import AuthInput from "@/components/AuthInput";
-import PasswordInput from "@/components/PasswordInput";
 import Image from "next/image";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
@@ -8,36 +8,114 @@ import { HiHome } from "react-icons/hi";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { authClient } from "@/lib/auth-client";
 
-const schema = yup
+const OTP_VALIDITY_SECONDS = 300;
+
+const emailSchema = yup
   .object({
     email: yup
       .string()
       .required("email is required")
       .email("please enter a valid email"),
-    password: yup
+  })
+  .required();
+
+const otpSchema = yup
+  .object({
+    otp: yup
       .string()
-      .required("password is required")
-      .min(6, "password must be at least 6 characters"),
+      .required("code is required")
+      .matches(/^\d{6}$/, "code must be 6 digits"),
   })
   .required();
 
 const Login = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid, isDirty, isSubmitting },
-  } = useForm({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-    resolver: yupResolver(schema),
+  const [step, setStep] = useState("email"); // "email" | "otp"
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [serverError, setServerError] = useState("");
+  const [secondsLeft, setSecondsLeft] = useState(OTP_VALIDITY_SECONDS);
+  const [resending, setResending] = useState(false);
+  const intervalRef = useRef(null);
+
+  const emailForm = useForm({
+    defaultValues: { email: "" },
+    resolver: yupResolver(emailSchema),
     mode: "onTouched",
   });
 
-  const onSubmit = async (data) => {
-    console.log(data);
+  const otpForm = useForm({
+    defaultValues: { otp: "" },
+    resolver: yupResolver(otpSchema),
+    mode: "onTouched",
+  });
+
+  const startTimer = () => {
+    clearInterval(intervalRef.current);
+    setSecondsLeft(OTP_VALIDITY_SECONDS);
+    intervalRef.current = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  useEffect(() => {
+    return () => clearInterval(intervalRef.current);
+  }, []);
+
+  const onSubmitEmail = async (data) => {
+    setServerError("");
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
+      email: data.email,
+      type: "sign-in",
+    });
+
+    if (error) {
+      setServerError(error.message || "Could not send the code, try again");
+      return;
+    }
+
+    setPendingEmail(data.email);
+    setStep("otp");
+    startTimer();
+  };
+
+  const onSubmitOtp = async (data) => {
+    setServerError("");
+    const { error } = await authClient.signIn.emailOtp({
+      email: pendingEmail,
+      otp: data.otp,
+    });
+
+    if (error) {
+      setServerError(error.message || "Invalid code");
+      return;
+    }
+
+    window.location.href = "/products";
+  };
+
+  const handleResend = async () => {
+    setServerError("");
+    setResending(true);
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
+      email: pendingEmail,
+      type: "sign-in",
+    });
+    setResending(false);
+
+    if (error) {
+      setServerError(error.message || "Could not resend the code, try again");
+      return;
+    }
+
+    otpForm.reset({ otp: "" });
+    startTimer();
   };
 
   return (
@@ -60,39 +138,102 @@ const Login = () => {
         <Link className="absolute top-10 right-10" href="/">
           <HiHome className="text-red-900 text-2xl" />
         </Link>
-        <h2 className="text-5xl font-semibold mb-10">Login</h2>
-        <form
-          className="flex flex-col gap-y-1 w-4/5"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <AuthInput
-            name="email"
-            placeholder="email"
-            register={register}
-            errors={errors}
-          />
-          <PasswordInput
-            name="password"
-            placeholder="password"
-            register={register}
-            errors={errors}
-          />
-          <button
-            disabled={!isValid || !isDirty || isSubmitting}
-            className="w-full rounded-full text-white text-lg font-semibold bg-red-900 py-2 cursor-pointer hover:bg-red-950 transition-all duration-300 disabled:cursor-not-allowed disabled:bg-red-900 disabled:opacity-45"
+        <h2 className="text-4xl font-semibold mb-10">
+          SignUp <span className="text-red-900">/</span> Login
+        </h2>
+
+        {step === "email" && (
+          <>
+            <form
+              className="flex flex-col w-4/5 gap-y-3"
+              onSubmit={emailForm.handleSubmit(onSubmitEmail)}
+            >
+              <AuthInput
+                name="email"
+                placeholder="email"
+                register={emailForm.register}
+                errors={emailForm.formState.errors}
+              />
+              <button
+                disabled={
+                  !emailForm.formState.isValid ||
+                  !emailForm.formState.isDirty ||
+                  emailForm.formState.isSubmitting
+                }
+                className="w-full rounded-full text-white text-lg font-semibold bg-red-900 py-2 cursor-pointer hover:bg-red-950 transition-all duration-300 disabled:cursor-not-allowed disabled:bg-red-900 disabled:opacity-45"
+              >
+                {emailForm.formState.isSubmitting
+                  ? "sending code..."
+                  : "send code"}
+              </button>
+            </form>
+            <button
+              onClick={() =>
+                authClient.signIn.social({
+                  provider: "google",
+                  callbackURL: "/products",
+                })
+              }
+              className="flex justify-center items-center border border-blue-500 gap-x-4 mt-6 w-4/5 rounded-full text-lg font-semibold bg-blue-100 py-2 cursor-pointer hover:bg-gray-200 transition-all duration-300"
+            >
+              login with google <FcGoogle className="text-2xl" />
+            </button>
+          </>
+        )}
+
+        {step === "otp" && (
+          <form
+            className="flex flex-col w-4/5 gap-y-3"
+            onSubmit={otpForm.handleSubmit(onSubmitOtp)}
           >
-            login to your account
-          </button>
-        </form>
-        <button className="flex justify-center items-center border border-blue-500 gap-x-4 mt-6 w-4/5 rounded-full text-lg font-semibold bg-blue-100 py-2 cursor-pointer hover:bg-gray-200 transition-all duration-300">
-          login with google <FcGoogle className="text-2xl" />
-        </button>
-        <Link href="/signup" className="text-red-900 mt-4">
-          haven't registered yet?
-        </Link>
-        <Link href="/forgot-password" className="text-red-900 mt-2">
-          forgot password?
-        </Link>
+            <p className="text-sm text-gray-600 mb-2 pl-2 text-center">
+              We sent a code to {pendingEmail}
+            </p>
+            <AuthInput
+              name="otp"
+              placeholder="6-digit code"
+              register={otpForm.register}
+              errors={otpForm.formState.errors}
+            />
+
+            <button
+              disabled={
+                !otpForm.formState.isValid ||
+                otpForm.formState.isSubmitting ||
+                secondsLeft === 0
+              }
+              className="mt-2 w-full rounded-full text-white text-lg font-semibold bg-red-900 py-2 cursor-pointer hover:bg-red-950 transition-all duration-300 disabled:cursor-not-allowed disabled:bg-red-900 disabled:opacity-45"
+            >
+              {otpForm.formState.isSubmitting
+                ? "verifying..."
+                : "verify & login"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={secondsLeft > 0 || resending}
+              className="text-red-900 font-semibold mt-3 disabled:text-gray-700 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {resending
+                ? "resending..."
+                : secondsLeft > 0
+                  ? `resend code (${secondsLeft}s)`
+                  : "resend code"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                clearInterval(intervalRef.current);
+                setStep("email");
+              }}
+              className="text-red-900 font-semibold mt-1 cursor-pointer"
+            >
+              wrong email? go back
+            </button>
+          </form>
+        )}
       </section>
 
       <svg width="0" height="0" className="absolute">
