@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PiShoppingCartSimpleDuotone } from "react-icons/pi";
+import { useSession } from "@/lib/auth-client";
+import { PiUserCircleDuotone } from "react-icons/pi";
 
 const headerLinks = [
   {
@@ -28,6 +30,8 @@ const headerLinks = [
 ];
 
 const Header = () => {
+  const { data, isPending } = useSession();
+
   return (
     <header className="w-[98%] rounded-b-2xl mx-auto flex justify-between items-center px-10 py-2 sticky top-0 bg-white/10 backdrop-blur-md z-50">
       <Link href="/">
@@ -47,9 +51,24 @@ const Header = () => {
           );
         })}
       </div>
-      <Link href="/cart">
-        <PiShoppingCartSimpleDuotone className="text-red-900 text-2xl" />
-      </Link>
+      {isPending ? (
+        <div></div>
+      ) : data ? (
+        <div className="flex items-center gap-x-3">
+          <Link href="/cart">
+            <PiShoppingCartSimpleDuotone className="text-red-900 text-[26px]" />
+          </Link>
+          <Link href="/profile">
+            <PiUserCircleDuotone className="text-[32px] text-red-900" />
+          </Link>
+        </div>
+      ) : (
+        <Link href="/login">
+          <button className="px-3 py-1.5 font-semibold rounded-2xl bg-red-900 text-white cursor-pointer">
+            Login / Signup
+          </button>
+        </Link>
+      )}
     </header>
   );
 };

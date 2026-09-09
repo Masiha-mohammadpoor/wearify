@@ -3,8 +3,7 @@ import { FaStar } from "react-icons/fa6";
 import { BiCartAdd } from "react-icons/bi";
 import { BiDollar } from "react-icons/bi";
 
-const ProductCard = ({ product: { name, price, category, image } }) => {
-  console.log(name, price, category, image);
+const ProductCard = ({ product: { name, price, category, image }}) => {
   return (
     <article className="col-span-3 rounded-xl p-2 bg-[#f4ece4] h-fit">
       <div className="relative w-full h-50 rounded-xl overflow-hidden">

@@ -18,7 +18,7 @@ const Products = async () => {
       <section className="col-span-9 grid grid-cols-12 gap-3 ">
         {products &&
           products.map((product) => {
-            return <ProductCard key={product.id} product={product} />;
+            return <ProductCard key={product.id} product={product}/>;
           })}
       </section>
     </main>
