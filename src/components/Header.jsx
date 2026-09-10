@@ -43,7 +43,7 @@ const Header = () => {
             <Link
               key={item.id}
               href={item.link}
-              className="group relative px-3 py-3 flex items-center justify-center"
+              className="group relative px-3 py-3 flex items-center justify-center font-bold"
             >
               {item.text}
               <span className="absolute w-0 h-0.75 rounded-full bg-red-900 bottom-0 left-0 transition-all duration-300 group-hover:w-full"></span>

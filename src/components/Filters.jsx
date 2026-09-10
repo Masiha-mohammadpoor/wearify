@@ -36,7 +36,7 @@ const Filters = () => {
             <TbCut className="text-red-900" /> Size
           </h3>
           <div>
-            <SizeFilter />
+            <SizeFilter multiple/>
           </div>
         </div>
         {/* color */}
@@ -45,7 +45,7 @@ const Filters = () => {
             <IoIosColorPalette className="text-red-900" /> Color
           </h3>
           <div>
-            <ColorFilter />
+            <ColorFilter multiple />
           </div>
         </div>
         {/* price */}

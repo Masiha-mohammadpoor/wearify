@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { getCart } from "@/lib/cart";
-import { getCachedProducts } from "@/lib/printful";
+import { getCachedProducts } from "@/lib/products";
 
 export async function GET() {
   try {

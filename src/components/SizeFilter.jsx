@@ -2,24 +2,40 @@
 
 import { useState } from "react";
 
-const sizes = ["S", "M", "L", "XL", "XXL"];
-
-const SizeFilter = ({ onChange }) => {
-  const [selected, setSelected] = useState([]);
+const SizeFilter = ({ 
+  sizes = ["S", "M", "L", "XL", "XXL"], 
+  multiple = false, 
+  onChange 
+}) => {
+  const [selected, setSelected] = useState(multiple ? [] : null);
 
   const toggleSize = (size) => {
-    const updated = selected.includes(size)
-      ? selected.filter((s) => s !== size)
-      : [...selected, size];
+    let updated;
+
+    if (multiple) {
+      updated = selected.includes(size)
+        ? selected.filter((s) => s !== size)
+        : [...selected, size];
+    } else {
+      updated = selected === size ? null : size;
+    }
 
     setSelected(updated);
     onChange?.(updated);
   };
 
+  const isSelected = (size) => {
+    if (multiple) {
+      return selected.includes(size);
+    } else {
+      return selected === size;
+    }
+  };
+
   return (
     <div className="flex flex-wrap gap-2">
       {sizes.map((size) => {
-        const isActive = selected.includes(size);
+        const isActive = isSelected(size);
         return (
           <button
             key={size}

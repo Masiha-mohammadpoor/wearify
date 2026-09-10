@@ -2,33 +2,49 @@
 
 import { useState } from "react";
 
-const colors = [
-  "#000000",
-  "#FFFFFF",
-  "#EF4444",
-  "#3B82F6",
-  "#22C55E",
-  "#EAB308",
-  "#EC4899",
-  "#6B7280",
-];
-
-const ColorFilter = ({ onChange }) => {
-  const [selected, setSelected] = useState([]);
+const ColorFilter = ({ 
+  colors = [
+    "#000000",
+    "#FFFFFF",
+    "#EF4444",
+    "#3B82F6",
+    "#22C55E",
+    "#EAB308",
+    "#EC4899",
+    "#6B7280",
+  ],
+  multiple = false,
+  onChange 
+}) => {
+  const [selected, setSelected] = useState(multiple ? [] : null);
 
   const toggleColor = (hex) => {
-    const updated = selected.includes(hex)
-      ? selected.filter((c) => c !== hex)
-      : [...selected, hex];
+    let updated;
+
+    if (multiple) {
+      updated = selected.includes(hex)
+        ? selected.filter((c) => c !== hex)
+        : [...selected, hex];
+    } else {
+      updated = selected === hex ? null : hex;
+    }
 
     setSelected(updated);
     onChange?.(updated);
   };
 
+  const isSelected = (hex) => {
+    if (multiple) {
+      return selected.includes(hex);
+    } else {
+      return selected === hex;
+    }
+  };
+
   return (
     <div className="flex flex-wrap gap-3">
       {colors.map((color) => {
-        const isActive = selected.includes(color);
+        const isActive = isSelected(color);
         return (
           <button
             key={color}

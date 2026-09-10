@@ -1,7 +1,7 @@
 import ProductCard from "@/components/ProductCard";
 import Filters from "@/components/Filters";
 import SortProducts from "@/components/SortProducts";
-import { getCachedProducts } from "@/lib/printful";
+import { getCachedProducts } from "@/lib/products";
 
 const Products = async () => {
   const products = await getCachedProducts();

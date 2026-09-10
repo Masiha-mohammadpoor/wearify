@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { FaStar } from "react-icons/fa6";
-import { BiCartAdd } from "react-icons/bi";
 import { BiDollar } from "react-icons/bi";
+import Link from "next/link";
 
-const ProductCard = ({ product: { name, price, category, image }}) => {
+const ProductCard = ({ product: { id, name, price, category, image }}) => {
   return (
     <article className="col-span-3 rounded-xl p-2 bg-[#f4ece4] h-fit">
       <div className="relative w-full h-50 rounded-xl overflow-hidden">
@@ -31,9 +31,9 @@ const ProductCard = ({ product: { name, price, category, image }}) => {
           <span className="font-semibold text-lg flex items-center gap-x-0.5">
             <BiDollar className="text-red-900" /> {price}
           </span>
-          <button className="bg-red-900 py-1 px-1.5 rounded-xl text-white text-sm cursor-pointer flex items-center justify-center gap-x-1">
-            Add To Cart <BiCartAdd className="text-lg mb-0.75" />
-          </button>
+          <Link href={`/products/${id}`}>
+            <button className="bg-red-900 py-1 px-1.5 rounded-xl text-white text-sm cursor-pointer flex items-center justify-center gap-x-1">see product</button>
+          </Link>
         </div>
       </div>
     </article>
