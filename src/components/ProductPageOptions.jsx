@@ -7,20 +7,15 @@ import AddToCartButton from "./AddToCartButton";
 import { useEffect, useState } from "react";
 
 const ProductPageOptions = ({ product }) => {
-  const [size, setSize] = useState("");
+  const [size, setSize] = useState(null);
   const [color, setColor] = useState("White");
-  const [variantId, SetVariantId] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
-    if (size && color) {
-      product.variants.map((variant) => {
-        if (variant.color === color && variant.size === size) {
-          SetVariantId(variant.id);
-        }
-      });
-    }
-  }, [size, color]);
+  const variantId =
+    size && color
+      ? (product.variants.find((v) => v.color === color && v.size === size)
+          ?.id ?? null)
+      : null;
 
   return (
     <main className="grid grid-cols-12 gap-4 mt-10 mx-20">
@@ -40,14 +35,18 @@ const ProductPageOptions = ({ product }) => {
         </span>
         <h3 className="font-bold text-3xl">{product.name}</h3>
         <div className="flex flex-col gap-y-1">
-          <p>Select Size:</p>
+          <p>
+            <span className="text-red-500 mb-2 text-2xl">*</span>Select Size:
+          </p>
           <SizeFilter
             sizes={product.sizes}
             onChange={(value) => setSize(value)}
           />
         </div>
         <div className="flex flex-col gap-y-1">
-          <p>Select Color:</p>
+          <p>
+            <span className="text-red-500 mb-2 text-2xl">*</span>Select Color:
+          </p>
           <ColorFilter />
         </div>
         <div className="font-semibold text-3xl flex items-start">
