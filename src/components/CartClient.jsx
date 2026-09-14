@@ -7,6 +7,7 @@ import {
   updateProductQuantity,
 } from "@/services/cartServices";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BiDollar } from "react-icons/bi";
 import { FaMinus, FaPlus, FaTrashCan } from "react-icons/fa6";
@@ -56,6 +57,12 @@ const CartClient = ({ cartItems }) => {
     }
   };
 
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + Number(item.price) * item.quantity,
+    0
+  );
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
     <main className="grid grid-cols-12 gap-8 mt-10 mx-20 ">
       <h3 className="col-span-12 text-xl font-semibold">
@@ -73,7 +80,7 @@ const CartClient = ({ cartItems }) => {
               className="w-full rounded-2xl bg-[#f4ece4] p-3 flex items-center justify-between"
             >
               <div className="flex items-center gap-x-5">
-                <div className="w-30 h-30 rounded-2xl relative bg-red-300 overflow-hidden">
+                <div className="w-30 h-30 rounded-2xl relative overflow-hidden">
                   <Image
                     src={item.image}
                     alt={`${item.name} image`}
@@ -154,7 +161,49 @@ const CartClient = ({ cartItems }) => {
           );
         })}
       </section>
-      <section className="col-span-4 bg-blue-300">d</section>
+
+      <section className="col-span-4 h-fit rounded-2xl bg-[#f4ece4] p-6 flex flex-col gap-4">
+        <h3 className="text-xl font-semibold">Order Summary</h3>
+
+        <div className="flex justify-between text-gray-700">
+          <span>Items ({totalQuantity})</span>
+          <span className="flex items-center">
+            <BiDollar className="text-red-900 mb-1" />
+            {subtotal.toFixed(2)}
+          </span>
+        </div>
+
+        <div className="flex justify-between text-gray-700">
+          <span>Total Quantity</span>
+          <span className="font-semibold text-red-900">{totalQuantity}</span>
+        </div>
+
+        <div className="flex justify-between text-gray-700">
+          <span>Shipping</span>
+          <span className="text-sm">Calculated at checkout</span>
+        </div>
+
+        <hr className="border-red-900/20" />
+
+        <div className="flex justify-between text-lg font-semibold">
+          <span>Total</span>
+          <span className="flex items-center">
+            <BiDollar className="text-red-900 mb-1.5" />
+            {subtotal.toFixed(2)}
+          </span>
+        </div>
+
+        <Link
+          href="/checkout"
+          className={`w-full text-center rounded-full text-white text-lg font-semibold bg-red-900 py-2 mt-2 transition-all duration-300 ${
+            cartItems.length === 0
+              ? "opacity-45 pointer-events-none"
+              : "hover:bg-red-950"
+          }`}
+        >
+          Proceed to Checkout
+        </Link>
+      </section>
     </main>
   );
 };
