@@ -59,10 +59,32 @@ const CartClient = ({ cartItems }) => {
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + Number(item.price) * item.quantity,
-    0
+    0,
   );
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+  if (cartItems.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-y-4">
+        <div className="relative mx-auto mt-10 w-90 h-60 ">
+          <Image
+            src="/emptyCart.png"
+            alt="empty cart"
+            fill
+            className=" absolute object-contain"
+          />
+        </div>
+        <h3 className="text-lg text-red-900 font-semibold">
+          Your shopping cart is empty.
+        </h3>
+        <Link href="/products">
+          <button className="px-4 py-1.5 rounded-2xl bg-red-900 text-white font-semibold text-xl cursor-pointer">
+            Go To Products Page
+          </button>
+        </Link>
+      </div>
+    );
+  }
   return (
     <main className="grid grid-cols-12 gap-8 mt-10 mx-20 ">
       <h3 className="col-span-12 text-xl font-semibold">
