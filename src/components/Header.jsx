@@ -58,7 +58,7 @@ const Header = () => {
           <Link href="/cart">
             <PiShoppingCartSimpleDuotone className="text-red-900 text-[26px]" />
           </Link>
-          <Link href="/profile">
+          <Link href="/profile/dashboard">
             <PiUserCircleDuotone className="text-[32px] text-red-900" />
           </Link>
         </div>

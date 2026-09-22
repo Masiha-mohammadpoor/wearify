@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LuHouse, LuShoppingBag, LuUserPen, LuPower } from "react-icons/lu";
+import { LuHouse, LuShoppingBag, LuUserPen, LuPower , LuLayoutDashboard} from "react-icons/lu";
 
 const menuLinks = [
   {
@@ -13,12 +13,18 @@ const menuLinks = [
   },
   {
     id: 2,
+    title: "Dashboard",
+    icon: <LuLayoutDashboard />,
+    href: "/profile/dashboard",
+  },
+  {
+    id: 3,
     title: "Order Hostory",
     icon: <LuShoppingBag />,
     href: "/profile/order-history",
   },
   {
-    id: 3,
+    id: 4,
     title: "Complete Profile",
     icon: <LuUserPen />,
     href: "/profile/complete-profile",
@@ -29,7 +35,7 @@ const ProfileMenu = () => {
   const pathname = usePathname();
   return (
     <section className="pt-5 pb-8 px-5 col-span-2 bg-[#f4ece4] flex flex-col items-start justify-between">
-      <div className="flex flex-col gap-y-10 w-full">
+      <div className="flex flex-col gap-y-10 w-full items-start">
         <div className="flex flex-col items-center gap-y-2">
           <Link href="/">
             <div className="relative w-40 h-14">
