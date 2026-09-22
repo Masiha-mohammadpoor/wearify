@@ -14,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${comfortaa.className} antialiased h-full`}>
-      <body className="min-h-full bg-[#FDF8F6] grid grid-cols-10">
+      <body className="min-h-full bg-[#FDF8F6] grid grid-cols-10 overflow-hidden">
         <ProfileMenu />
         {children}
       </body>

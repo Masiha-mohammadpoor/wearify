@@ -3,6 +3,7 @@ import PersonalInfoItem from "@/components/PersonalInfoItem";
 import Link from "next/link";
 import {
   LuCalendar,
+  LuLayoutDashboard,
   LuMapPin,
   LuPencil,
   LuPhone,
@@ -12,7 +13,8 @@ import { HiOutlineMail } from "react-icons/hi";
 
 const DashboardPage = () => {
   return (
-    <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8">
+    <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8 h-screen overflow-y-scroll">
+      <h1 className="text-2xl font-semibold flex gap-4 items-center">Dashboard</h1>
       {/* dashboard cards */}
       <section className="w-full grid grid-cols-12 gap-8">
         <DashboardCard title="My Order" value={10} />

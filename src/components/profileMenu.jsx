@@ -34,7 +34,7 @@ const menuLinks = [
 const ProfileMenu = () => {
   const pathname = usePathname();
   return (
-    <section className="pt-5 pb-8 px-5 col-span-2 bg-[#f4ece4] flex flex-col items-start justify-between">
+    <section className="h-screen pt-5 pb-8 px-5 col-span-2 bg-[#f4ece4] flex flex-col items-start justify-between">
       <div className="flex flex-col gap-y-10 w-full items-start">
         <div className="flex flex-col items-center gap-y-2">
           <Link href="/">
@@ -47,9 +47,9 @@ const ProfileMenu = () => {
               />
             </div>
           </Link>
-          <p className="text-xs mr-5 text-gray-500">Your Personal Space</p>
+          <p className="text-xs mr-5 text-[#8e7973]">Your Personal Space</p>
         </div>
-        <div className="flex flex-col gap-y-5">
+        <div className="flex flex-col gap-y-5 w-full">
           {menuLinks.map((item) => {
             const isActive = pathname === item.href;
 
