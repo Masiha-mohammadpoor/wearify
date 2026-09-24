@@ -5,6 +5,7 @@ const ProfileInput = ({
   placeholder,
   style,
   disabled = false,
+  register
 }) => {
   return (
     <div className={`flex flex-col items-start ${style}`}>
@@ -18,6 +19,7 @@ const ProfileInput = ({
         disabled={disabled}
         autoComplete="off"
         className="w-full outline-none rounded-xl border border-[#dfcec6] py-2 px-4 bg-[#FDF8F6] disabled:border-[#dfcec6] disabled:bg-[#eadfd7] focus:border-red-900"
+        {...register(name)}
       />
     </div>
   );

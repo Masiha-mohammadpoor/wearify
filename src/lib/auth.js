@@ -30,6 +30,57 @@ export const auth = betterAuth({
     enabled: false,
   },
 
+  user: {
+    additionalFields: {
+      firstName: { type: "string", required: false },
+      lastName: { type: "string", required: false },
+      phoneNumber: { type: "string", required: false },
+      country: { type: "string", required: false },
+      city: { type: "string", required: false },
+      address: { type: "string", required: false },
+      postalCode: { type: "string", required: false },
+      profileCompleted: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+    },
+  },
+
+  databaseHooks: {
+    user: {
+      update: {
+        before: async (data, ctx) => {
+          const currentUser = ctx?.context?.session?.user || {};
+
+          const merged = { ...currentUser, ...data };
+
+          const requiredFields = [
+            "firstName",
+            "lastName",
+            "phoneNumber",
+            "country",
+            "city",
+            "address",
+            "postalCode",
+          ];
+
+          const isComplete = requiredFields.every(
+            (field) => merged[field] && merged[field].toString().trim() !== "",
+          );
+
+          return {
+            data: {
+              ...data,
+              profileCompleted: isComplete,
+            },
+          };
+        },
+      },
+    },
+  },
+
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID,

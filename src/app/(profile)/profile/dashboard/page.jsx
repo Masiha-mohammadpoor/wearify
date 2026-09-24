@@ -24,7 +24,7 @@ const DashboardPage = () => {
       {/* user info */}
       <section className="relative w-full rounded-xl bg-[#f4ece4] p-10 flex flex-col gap-y-10">
         <Link
-          href="profile/complete-profile"
+          href="/profile/complete-profile"
           className="inline-block p-4 text-white bg-red-900 rounded-xl text-xl absolute right-8 top-8"
         >
           <LuPencil />
