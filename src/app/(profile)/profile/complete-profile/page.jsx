@@ -7,6 +7,7 @@ import * as yup from "yup";
 import { useSession, authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { TiWarning , TiTick} from "react-icons/ti";
 
 const schema = yup.object({
   firstName: yup.string().required("First name is required"),
@@ -159,8 +160,8 @@ const CompleteProfile = () => {
               }`}
             >
               {session?.user?.profileCompleted
-                ? "Completed Profile"
-                : "Incomplete Profile"}
+                ? <span className="flex items-center gap-x-2"><TiTick className="mb-1"/> Completed Profile</span>
+                : <span className="flex items-center gap-x-2"><TiWarning className="mb-1"/> Incomplete Profile</span>}
             </span>
           </div>
         </article>

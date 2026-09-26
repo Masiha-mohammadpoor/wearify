@@ -1,20 +1,53 @@
+"use client";
 import DashboardCard from "@/components/DashboardCard";
 import PersonalInfoItem from "@/components/PersonalInfoItem";
 import Link from "next/link";
+import { useSession } from "@/lib/auth-client";
 import {
   LuCalendar,
-  LuLayoutDashboard,
   LuMapPin,
   LuPencil,
   LuPhone,
   LuUserRound,
 } from "react-icons/lu";
 import { HiOutlineMail } from "react-icons/hi";
+import { TiTick, TiWarning } from "react-icons/ti";
 
 const DashboardPage = () => {
+  const { data: session, isPending } = useSession();
+
+  if (isPending) {
+    return (
+      <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8 h-screen overflow-y-scroll">
+        <p>Loading...</p>
+      </main>
+    );
+  }
+
+  const user = session?.user;
+
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ");
+
+  const avatarLetter =
+    user?.firstName?.[0]?.toUpperCase() ||
+    user?.email?.[0]?.toUpperCase() ||
+    "?";
+
+  const registeredDate = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  const location = [user?.city, user?.country].filter(Boolean).join(", ");
+
   return (
     <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8 h-screen overflow-y-scroll">
-      <h1 className="text-2xl font-semibold flex gap-4 items-center">Dashboard</h1>
+      <h1 className="text-2xl font-semibold flex gap-4 items-center">
+        Dashboard
+      </h1>
       {/* dashboard cards */}
       <section className="w-full grid grid-cols-12 gap-8">
         <DashboardCard title="My Order" value={10} />
@@ -31,13 +64,33 @@ const DashboardPage = () => {
         </Link>
         <div className="flex justify-start items-center gap-x-5">
           <div className="w-30 h-30 rounded-full text-white bg-red-900 flex justify-center items-center text-3xl font-bold">
-            M
+            {avatarLetter}
           </div>
           <div className="flex flex-col gap-y-3">
-            <h3 className="text-2xl font-semibold">Masiha Mhmpr</h3>
-            <p className="text-sm text-gray-500">Registered on July 15, 2026</p>
-            <span className="inline-block w-fit mt-1.5 px-2 py-1 text-green-800 bg-green-100 border-2 border-green-800 rounded-full text-xs">
-              Completed Profile
+            <h3 className="text-2xl font-semibold">
+              {fullName || "Your name"}
+            </h3>
+            {registeredDate && (
+              <p className="text-sm text-gray-500">
+                Registered on {registeredDate}
+              </p>
+            )}
+            <span
+              className={`inline-block w-fit mt-1.5 px-2 py-1 border-2 rounded-full text-xs ${
+                session?.user?.profileCompleted
+                  ? "text-green-800 bg-green-100 border-green-800"
+                  : "text-yellow-800 bg-yellow-100 border-yellow-800"
+              }`}
+            >
+              {session?.user?.profileCompleted ? (
+                <span className="flex items-center gap-x-2">
+                  <TiTick className="mb-1" /> Completed Profile
+                </span>
+              ) : (
+                <span className="flex items-center gap-x-2">
+                  <TiWarning className="mb-1" /> Incomplete Profile
+                </span>
+              )}
             </span>
           </div>
         </div>
@@ -48,27 +101,27 @@ const DashboardPage = () => {
           </h3>
           <PersonalInfoItem
             title="Full Name"
-            value="Masiha Mohammadpour"
+            value={fullName || "Not set"}
             icon={<LuUserRound />}
           />
           <PersonalInfoItem
             title="Email Address"
-            value="masih@gmail.com"
+            value={user?.email || "Not set"}
             icon={<HiOutlineMail />}
           />
           <PersonalInfoItem
             title="Phone Number"
-            value="+989113295810"
+            value={user?.phoneNumber || "Not set"}
             icon={<LuPhone />}
           />
           <PersonalInfoItem
             title="Location"
-            value="Iran , Mazandaran"
+            value={location || "Not set"}
             icon={<LuMapPin />}
           />
           <PersonalInfoItem
             title="Join Date"
-            value="September 16, 2026"
+            value={registeredDate || "Not set"}
             icon={<LuCalendar />}
           />
         </div>
