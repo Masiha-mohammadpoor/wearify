@@ -1,8 +1,9 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LuHouse, LuShoppingBag, LuUserPen, LuPower , LuLayoutDashboard} from "react-icons/lu";
+import { usePathname, useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { LuHouse, LuShoppingBag, LuUserPen, LuPower, LuLayoutDashboard } from "react-icons/lu";
 
 const menuLinks = [
   {
@@ -33,6 +34,19 @@ const menuLinks = [
 
 const ProfileMenu = () => {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/");
+          router.refresh();
+        },
+      },
+    });
+  };
+
   return (
     <section className="h-screen pt-5 pb-8 px-5 col-span-2 bg-[#f4ece4] flex flex-col items-start justify-between">
       <div className="flex flex-col gap-y-10 w-full items-start">
@@ -66,7 +80,10 @@ const ProfileMenu = () => {
           })}
         </div>
       </div>
-      <button className="px-5 py-2 rounded-xl  w-full flex justify-between items-center cursor-pointer text-red-900 hover:bg-red-900 hover:text-white transition-all duration-500">
+      <button
+        onClick={handleLogout}
+        className="px-5 py-2 rounded-xl  w-full flex justify-between items-center cursor-pointer text-red-900 hover:bg-red-900 hover:text-white transition-all duration-500"
+      >
         <span>Logout</span> <LuPower className="text-xl" />
       </button>
     </section>
