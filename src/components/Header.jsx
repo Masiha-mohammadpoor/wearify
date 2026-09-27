@@ -1,5 +1,5 @@
 "use client";
-
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { PiShoppingCartSimpleDuotone } from "react-icons/pi";
@@ -31,6 +31,23 @@ const headerLinks = [
 
 const Header = () => {
   const { data, isPending } = useSession();
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    if (!data) {
+      setCartCount(0);
+      return;
+    }
+
+    fetch("/api/cart")
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.success) {
+          setCartCount(result.data.totalItems);
+        }
+      })
+      .catch((err) => console.error("Error fetching cart:", err));
+  }, [data]);
 
   return (
     <header className="w-[98%] rounded-b-2xl mx-auto flex justify-between items-center px-10 py-2 sticky top-0 bg-white/10 backdrop-blur-md z-50">
@@ -55,8 +72,13 @@ const Header = () => {
         <div></div>
       ) : data ? (
         <div className="flex items-center gap-x-3">
-          <Link href="/cart">
+          <Link href="/cart" className="relative">
             <PiShoppingCartSimpleDuotone className="text-red-900 text-[26px]" />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-900 text-white text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center">
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
+            )}
           </Link>
           <Link href="/profile/dashboard">
             <PiUserCircleDuotone className="text-[32px] text-red-900" />
