@@ -8,6 +8,7 @@ import { useSession, authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { TiWarning , TiTick} from "react-icons/ti";
+import toast from "react-hot-toast";
 
 const schema = yup.object({
   firstName: yup.string().required("First name is required"),
@@ -107,6 +108,7 @@ const CompleteProfile = () => {
       return;
     }
 
+    toast.success("Changes saved")
     router.back();
   };
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { LuHouse, LuShoppingBag, LuUserPen, LuPower, LuLayoutDashboard } from "react-icons/lu";
+import toast from "react-hot-toast";
 
 const menuLinks = [
   {
@@ -45,6 +46,7 @@ const ProfileMenu = () => {
         },
       },
     });
+    toast.success("Logged out")
   };
 
   return (

@@ -1,5 +1,7 @@
+import { Toaster } from 'react-hot-toast';
 import { Comfortaa } from "next/font/google";
 import "../globals.css";
+import ToasterProvider from '@/components/ToasterProvider';
 
 const comfortaa = Comfortaa({
   subsets: ["latin"],
@@ -15,6 +17,7 @@ export default function Layout({ children }) {
     <html lang="en" className={`${comfortaa.className} antialiased h-full`}>
       <body className="min-h-full flex flex-col bg-[#FDF8F6]">
         {children}
+        <ToasterProvider/>
       </body>
     </html>
   );

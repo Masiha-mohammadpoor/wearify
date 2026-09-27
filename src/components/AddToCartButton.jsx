@@ -6,6 +6,7 @@ import { FaPlus } from "react-icons/fa6";
 import { FaMinus } from "react-icons/fa6";
 import { addToCart } from "@/services/cartServices";
 import { PiSealWarning } from "react-icons/pi";
+import toast from "react-hot-toast";
 
 export default function AddToCartButton({
   productId,
@@ -19,6 +20,7 @@ export default function AddToCartButton({
 
   const handleAddToCart = async () => {
     if (!session) {
+      toast.error("Plaese login first")
       router.push("/login");
       return;
     }
@@ -28,6 +30,7 @@ export default function AddToCartButton({
     try {
       const data = { productId, variantId, quantity };
       const response = await addToCart(data);
+      toast.success("Product added to cart")
       if (!response.success) {
         throw new Error(response.data.error || "Failed to add to cart");
       }

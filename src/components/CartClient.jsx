@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BiDollar } from "react-icons/bi";
 import { FaMinus, FaPlus, FaTrashCan } from "react-icons/fa6";
+import toast from "react-hot-toast";
 
 const CartClient = ({ cartItems }) => {
   const router = useRouter();
@@ -19,14 +20,15 @@ const CartClient = ({ cartItems }) => {
 
   const removeProductHandler = async (data) => {
     if (!session) {
+      toast.error("Please login first")
       router.push("/login");
       return;
     }
 
     try {
       const res = await removeProductFromCart({ data });
+      toast.success("Product removed from cart")
       router.refresh();
-      console.log(res);
     } catch (err) {
       console.log(err.response?.data?.message);
     }

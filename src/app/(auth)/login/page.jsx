@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 const OTP_VALIDITY_SECONDS = 300;
 
@@ -93,10 +94,12 @@ const Login = () => {
     });
 
     if (error) {
+      toast.error("Invalid code")
       setServerError(error.message || "Invalid code");
       return;
     }
 
+    toast.success("Logged in successfully")
     window.location.href = "/products";
   };
 
@@ -114,6 +117,7 @@ const Login = () => {
       return;
     }
 
+    toast.success("Code resent")
     otpForm.reset({ otp: "" });
     startTimer();
   };

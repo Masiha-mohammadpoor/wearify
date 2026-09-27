@@ -8,6 +8,7 @@ import {
   LuMapPin,
   LuPencil,
   LuPhone,
+  LuSignpostBig,
   LuUserRound,
 } from "react-icons/lu";
 import { HiOutlineMail } from "react-icons/hi";
@@ -118,6 +119,11 @@ const DashboardPage = () => {
             title="Location"
             value={location || "Not set"}
             icon={<LuMapPin />}
+          />
+          <PersonalInfoItem
+            title="Postal Code"
+            value={user?.postalCode || "Not set"}
+            icon={<LuSignpostBig />}
           />
           <PersonalInfoItem
             title="Join Date"

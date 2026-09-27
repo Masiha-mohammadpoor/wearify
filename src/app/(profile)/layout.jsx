@@ -1,6 +1,9 @@
+import { Toaster } from 'react-hot-toast';
 import { Comfortaa } from "next/font/google";
 import "../globals.css";
 import ProfileMenu from "@/components/profileMenu";
+import ToasterProvider from "@/components/ToasterProvider";
+
 
 const comfortaa = Comfortaa({
   subsets: ["latin"],
@@ -17,6 +20,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full bg-[#FDF8F6] grid grid-cols-10 overflow-hidden">
         <ProfileMenu />
         {children}
+        <ToasterProvider/>
       </body>
     </html>
   );
