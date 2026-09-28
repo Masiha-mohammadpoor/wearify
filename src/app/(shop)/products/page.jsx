@@ -22,7 +22,7 @@ const Products = async ({ searchParams }) => {
       {/* sort */}
       <SortProducts />
       {/* filters */}
-      <section className="col-span-3 bg-[#f4ece4] h-fit self-start sticky top-18 p-4 rounded-xl">
+      <section className="col-span-3 bg-[#f4ece4] h-fit self-start sticky top-18 p-4 rounded-xl pb-8">
         <Filters options={filterOptions} activeFilters={params} />
       </section>
       {/* products */}

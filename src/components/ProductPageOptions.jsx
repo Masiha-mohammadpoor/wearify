@@ -1,21 +1,53 @@
 "use client";
 import Image from "next/image";
-import SizeFilter from "./SizeFilter";
-import ColorFilter from "./ColorFilter";
+import { useState } from "react";
 import { BiDollar } from "react-icons/bi";
+import SizeSelector from "./SizeSelector";
+import ColorSwatches from "./ColorSwatches";
 import AddToCartButton from "./AddToCartButton";
-import { useEffect, useState } from "react";
 
 const ProductPageOptions = ({ product }) => {
+  console.log(product);
   const [size, setSize] = useState(null);
-  const [color, setColor] = useState("White");
+  const [color, setColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  const variantId =
+  const selectedVariant =
     size && color
-      ? (product.variants.find((v) => v.color === color && v.size === size)
-          ?.id ?? null)
+      ? product.variants.find((v) => v.color === color && v.size === size)
       : null;
+
+  const variantId = selectedVariant?.id ?? null;
+
+  const availableSizes = color
+    ? new Set(
+        product.variants
+          .filter(
+            (v) => v.color === color && v.availability_status === "active",
+          )
+          .map((v) => v.size),
+      )
+    : null;
+
+  const unavailableSizes = availableSizes
+    ? product.sizes.filter((s) => !availableSizes.has(s))
+    : [];
+
+  const handleColorSelect = (newColor) => {
+    setColor(newColor);
+
+    if (size) {
+      const exists = product.variants.some(
+        (v) =>
+          v.color === newColor &&
+          v.size === size &&
+          v.availability_status === "active",
+      );
+      if (!exists) setSize(null);
+    }
+  };
+
+  const displayPrice = selectedVariant?.retail_price ?? product.price;
 
   return (
     <main className="grid grid-cols-12 gap-4 mt-10 mx-20">
@@ -38,19 +70,25 @@ const ProductPageOptions = ({ product }) => {
           <p>
             <span className="text-red-500 mb-2 text-2xl">*</span>Select Size:
           </p>
-          <SizeFilter
+          <SizeSelector
             sizes={product.sizes}
-            onChange={(value) => setSize(value)}
+            selected={size}
+            unavailable={unavailableSizes}
+            onSelect={setSize}
           />
         </div>
         <div className="flex flex-col gap-y-1">
           <p>
             <span className="text-red-500 mb-2 text-2xl">*</span>Select Color:
           </p>
-          <ColorFilter />
+          <ColorSwatches
+            swatches={product.colorSwatches}
+            selected={color}
+            onSelect={handleColorSelect}
+          />
         </div>
         <div className="font-semibold text-3xl flex items-start">
-          <BiDollar className="text-red-900 text-3xl" /> {product.price}
+          <BiDollar className="text-red-900 text-3xl" /> {displayPrice}
         </div>
         <AddToCartButton
           variantId={variantId}

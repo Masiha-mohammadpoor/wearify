@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCart } from "@/lib/cart";
-import { getCachedProducts } from "@/lib/products";
+import { getProductById } from "@/lib/products";
 import CartClient from "@/components/CartClient";
 
 const Cart = async () => {
@@ -13,11 +13,17 @@ const Cart = async () => {
   }
 
   const cart = await getCart(session.user.id);
-  const allProducts = await getCachedProducts();
+
+  const productIds = [...new Set(cart.items.map((i) => i.productId))];
+  const products = await Promise.all(
+    productIds.map((id) => getProductById(id).catch(() => null))
+  );
+  const productMap = new Map(productIds.map((id, i) => [id, products[i]]));
 
   const cartItems = cart.items.map((item) => {
-    const product = allProducts.find((p) => p.id === item.productId);
+    const product = productMap.get(item.productId);
     const variant = product?.variants?.find((v) => v.id === item.variantId);
+    const color = variant?.color || null;
 
     return {
       ...item,
@@ -25,7 +31,9 @@ const Cart = async () => {
       image: product?.image || "",
       category: product?.category || "general",
       size: variant?.size || null,
-      color: variant?.color || null,
+      color: color,
+      colorHex:
+        product?.colorSwatches?.find((s) => s.name === color)?.hex || null,
       price: variant?.retail_price || "0",
     };
   });

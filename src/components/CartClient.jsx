@@ -95,6 +95,7 @@ const CartClient = ({ cartItems }) => {
       </h3>
       <section className="col-span-8 flex flex-col gap-5">
         {cartItems.map((item) => {
+          console.log(item.colorHex)
           const itemKey = `${item.productId}-${item.variantId}`;
           const isUpdating = updatingKey === itemKey;
 
@@ -124,11 +125,11 @@ const CartClient = ({ cartItems }) => {
                     </div>
                     <div className="flex items-center gap-x-1">
                       color :
-                      <span className="text-red-900 text-lg flex items-center gap-x-1">
+                      <span className="text-red-900 text-lg flex items-center gap-x-4">
                         {item.color?.toLowerCase()}
                         <span
-                          className="block w-7 h-7 rounded-full shadow-2xs"
-                          style={{ backgroundColor: item.color?.toLowerCase() }}
+                          className="block w-6 h-6 rounded-full shadow-2xs"
+                          style={{backgroundColor:`${item.colorHex}`}}
                         ></span>
                       </span>
                     </div>

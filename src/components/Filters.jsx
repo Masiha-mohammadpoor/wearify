@@ -3,11 +3,9 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { VscFilter } from "react-icons/vsc";
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { TbCut } from "react-icons/tb";
-import { IoIosColorPalette } from "react-icons/io";
 import { RiMoneyDollarCircleFill } from "react-icons/ri";
 import Checkbox from "./Input";
 import SizeFilter from "./SizeFilter";
-import ColorFilter from "./ColorFilter";
 import PriceRangeSlider from "./PriceRangeSlider";
 
 const Filters = ({ options, activeFilters = {} }) => {
@@ -18,7 +16,6 @@ const Filters = ({ options, activeFilters = {} }) => {
   const activeCategories =
     activeFilters.category?.split(",").filter(Boolean) || [];
   const activeSizes = activeFilters.size?.split(",").filter(Boolean) || [];
-  const activeColors = activeFilters.color?.split(",").filter(Boolean) || [];
 
   const updateParams = (updates) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -76,18 +73,6 @@ const Filters = ({ options, activeFilters = {} }) => {
             sizes={options.sizes}
             value={activeSizes}
             onChange={(sizes) => updateParams({ size: sizes })}
-          />
-        </div>
-        {/* color */}
-        <div>
-          <h3 className="text-xl font-semibold flex items-center gap-x-2 mb-2">
-            <IoIosColorPalette className="text-red-900" /> Color
-          </h3>
-          <ColorFilter
-            multiple
-            colors={options.colors}
-            value={activeColors}
-            onChange={(colors) => updateParams({ color: colors })}
           />
         </div>
         {/* price */}
