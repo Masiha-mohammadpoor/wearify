@@ -1,36 +1,24 @@
 "use client";
 
-import { useState } from "react";
-
-const SizeFilter = ({ 
-  sizes = ["S", "M", "L", "XL", "XXL"], 
-  multiple = false, 
-  onChange 
-}) => {
-  const [selected, setSelected] = useState(multiple ? [] : null);
-
+const SizeFilter = ({ sizes = [], value = [], multiple = true, onChange }) => {
   const toggleSize = (size) => {
     let updated;
-
     if (multiple) {
-      updated = selected.includes(size)
-        ? selected.filter((s) => s !== size)
-        : [...selected, size];
+      updated = value.includes(size)
+        ? value.filter((s) => s !== size)
+        : [...value, size];
     } else {
-      updated = selected === size ? null : size;
+      updated = value === size ? null : size;
     }
-
-    setSelected(updated);
     onChange?.(updated);
   };
 
-  const isSelected = (size) => {
-    if (multiple) {
-      return selected.includes(size);
-    } else {
-      return selected === size;
-    }
-  };
+  const isSelected = (size) =>
+    multiple ? value.includes(size) : value === size;
+
+  if (sizes.length === 0) {
+    return <p className="text-sm text-gray-400">No sizes available</p>;
+  }
 
   return (
     <div className="flex flex-wrap gap-2">

@@ -1,11 +1,7 @@
 "use client";
-
-import { useState } from "react";
 import { Check } from "lucide-react";
 
-const Checkbox = ({ label }) => {
-  const [checked, setChecked] = useState(false);
-
+const Checkbox = ({ label, checked = false, onChange }) => {
   return (
     <label
       dir="rtl"
@@ -13,7 +9,7 @@ const Checkbox = ({ label }) => {
     >
       <span className="text-gray-700 text-base">{label}</span>
       <span
-        onClick={() => setChecked((c) => !c)}
+        onClick={onChange}
         className={`w-4 h-4 rounded-md border-2 flex items-center justify-center transition-all duration-200 ease-out
           ${
             checked
@@ -32,4 +28,5 @@ const Checkbox = ({ label }) => {
     </label>
   );
 };
+
 export default Checkbox;
