@@ -1,14 +1,17 @@
 "use client";
+import { useState } from "react";
 import ProfileInput from "@/components/ProfileInput";
+import CountrySelect from "@/components/CountrySelect";
+import StateSelect from "@/components/StateSelect";
 import { LuMapPin, LuPhone, LuUserRound } from "react-icons/lu";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useSession, authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { TiWarning , TiTick} from "react-icons/ti";
-import toast from "react-hot-toast";
+import { useCountries } from "@/lib/useCountries";
+import { TiWarning, TiTick } from "react-icons/ti";
 
 const schema = yup.object({
   firstName: yup.string().required("First name is required"),
@@ -25,22 +28,16 @@ const schema = yup.object({
       excludeEmptyString: true,
     })
     .typeError("Phone number must be a string"),
-
-  country: yup
-    .string()
-    .required("Country is required")
-    .typeError("Country must be a string"),
-
+  country: yup.string().required("Country is required"),
+  state: yup.string().nullable(),
   city: yup
     .string()
     .required("City is required")
     .typeError("City must be a string"),
-
   address: yup
     .string()
     .required("Address is required")
     .typeError("Address must be a string"),
-
   postalCode: yup
     .string()
     .required("Postal code is required")
@@ -50,11 +47,15 @@ const schema = yup.object({
 const CompleteProfile = () => {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const { countries } = useCountries();
+  const [stateError, setStateError] = useState("");
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
+    watch,
     formState: { errors, isValid, isDirty, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -63,6 +64,7 @@ const CompleteProfile = () => {
       email: "",
       phoneNumber: "",
       country: "",
+      state: "",
       city: "",
       address: "",
       postalCode: "",
@@ -70,6 +72,11 @@ const CompleteProfile = () => {
     resolver: yupResolver(schema),
     mode: "onTouched",
   });
+
+  const selectedCountry = watch("country");
+  const countryNeedsState = countries.find(
+    (c) => c.code === selectedCountry,
+  )?.states;
 
   useEffect(() => {
     if (session?.user) {
@@ -79,6 +86,7 @@ const CompleteProfile = () => {
         email: session.user.email || "",
         phoneNumber: session.user.phoneNumber || "",
         country: session.user.country || "",
+        state: session.user.state || "",
         city: session.user.city || "",
         address: session.user.address || "",
         postalCode: session.user.postalCode || "",
@@ -93,11 +101,18 @@ const CompleteProfile = () => {
   }, [isPending, session, router]);
 
   const onSubmit = async (data) => {
+    if (countryNeedsState && !data.state) {
+      setStateError("State/province is required for this country");
+      return;
+    }
+    setStateError("");
+
     const { error } = await authClient.updateUser({
       firstName: data.firstName,
       lastName: data.lastName,
       phoneNumber: data.phoneNumber,
       country: data.country,
+      state: data.state || null,
       city: data.city,
       address: data.address,
       postalCode: data.postalCode,
@@ -108,7 +123,6 @@ const CompleteProfile = () => {
       return;
     }
 
-    toast.success("Changes saved")
     router.back();
   };
 
@@ -161,13 +175,20 @@ const CompleteProfile = () => {
                   : "text-yellow-800 bg-yellow-100 border-yellow-800"
               }`}
             >
-              {session?.user?.profileCompleted
-                ? <span className="flex items-center gap-x-2"><TiTick className="mb-1"/> Completed Profile</span>
-                : <span className="flex items-center gap-x-2"><TiWarning className="mb-1"/> Incomplete Profile</span>}
+              {session?.user?.profileCompleted ? (
+                <span className="flex items-center gap-x-2">
+                  <TiTick className="mb-1" /> Completed Profile
+                </span>
+              ) : (
+                <span className="flex items-center gap-x-2">
+                  <TiWarning className="mb-1" /> Incomplete Profile
+                </span>
+              )}
             </span>
           </div>
         </article>
         <span className="w-full h-px bg-[#dfcec6]"></span>
+
         {/* =============== Personal Info =============== */}
         <article className="grid gid-cols-12 gap-y-7 gap-x-8">
           <div className="col-span-12 flex items-center gap-x-4">
@@ -191,6 +212,7 @@ const CompleteProfile = () => {
             register={register}
           />
         </article>
+
         {/* ================ Contact Info =============== */}
         <article className="grid gid-cols-12 gap-y-7 gap-x-8">
           <div className="col-span-12 flex items-center gap-x-4">
@@ -215,6 +237,7 @@ const CompleteProfile = () => {
             register={register}
           />
         </article>
+
         {/* =================== Location ===================== */}
         <article className="grid gid-cols-12 gap-y-7 gap-x-8">
           <div className="col-span-12 flex items-center gap-x-4">
@@ -223,13 +246,44 @@ const CompleteProfile = () => {
             </span>
             <h3 className="font-semibold text-lg">Location</h3>
           </div>
-          <ProfileInput
-            name="country"
-            label="Country"
-            placeholder="United States"
-            style="col-span-6"
-            register={register}
-          />
+
+          <div className="col-span-6">
+            <Controller
+              name="country"
+              control={control}
+              render={({ field }) => (
+                <CountrySelect
+                  name="country"
+                  label="Country"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.country?.message}
+                />
+              )}
+            />
+          </div>
+
+          <div className="col-span-6">
+            {countryNeedsState && (
+              <div>
+                <Controller
+                  name="state"
+                  control={control}
+                  render={({ field }) => (
+                    <StateSelect
+                      name="state"
+                      label="State"
+                      countryCode={selectedCountry}
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={stateError}
+                    />
+                  )}
+                />
+              </div>
+            )}
+          </div>
+
           <ProfileInput
             name="city"
             label="City"
@@ -237,6 +291,7 @@ const CompleteProfile = () => {
             style="col-span-6"
             register={register}
           />
+
           <div className="flex flex-col items-start col-span-12">
             <label
               htmlFor="address"
@@ -261,12 +316,13 @@ const CompleteProfile = () => {
             register={register}
           />
         </article>
+
         {/* =================== Save Button ==================== */}
         <span className="w-full h-px bg-[#dfcec6]"></span>
         <div className="w-full flex justify-end">
           <button
             disabled={!isValid || !isDirty || isSubmitting}
-            className="bg-red-900 cursor-pointer text-white rounded-xl px-3 py-2 hover:bg-red-950 transition-all duration-300  disabled:cursor-not-allowed disabled:bg-red-900 disabled:opacity-45"
+            className="bg-red-900 cursor-pointer text-white rounded-xl px-3 py-2 hover:bg-red-950 transition-all duration-300 disabled:cursor-not-allowed disabled:bg-red-900 disabled:opacity-45"
           >
             {isSubmitting ? "saving..." : "save & continue"}
           </button>

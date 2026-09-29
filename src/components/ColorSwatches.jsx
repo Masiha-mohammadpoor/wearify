@@ -15,7 +15,7 @@ const ColorSwatches = ({ swatches = [], selected, onSelect }) => {
             aria-label={name}
             onClick={() => onSelect?.(name)}
             className={`w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all duration-200
-              ${isActive ? "border-red-900 scale-110" : "border-gray-200"}`}
+              ${isActive ? "border-red-900 scale-110" : "border-gray-300"}`}
           >
             <span
               className="w-7 h-7 rounded-full border border-black/10"

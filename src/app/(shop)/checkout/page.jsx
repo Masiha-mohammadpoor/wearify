@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,9 @@ import { BiDollar } from "react-icons/bi";
 import { FaMinus, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { LuMapPin, LuPlus } from "react-icons/lu";
 import ProfileInput from "@/components/ProfileInput";
+import CountrySelect from "@/components/CountrySelect";
+import StateSelect from "@/components/StateSelect";
+import { useCountries } from "@/lib/useCountries";
 
 const addressSchema = yup
   .object({
@@ -25,6 +28,7 @@ const addressSchema = yup
       .required("Phone number is required")
       .matches(/^\+[1-9]\d{7,14}$/, "Phone number must include country code"),
     country: yup.string().required("Country is required"),
+    state: yup.string().nullable(),
     city: yup.string().required("City is required"),
     address: yup.string().required("Address is required"),
     postalCode: yup.string().required("Postal code is required"),
@@ -34,15 +38,19 @@ const addressSchema = yup
 const CheckoutPage = () => {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const { countries } = useCountries();
 
   const [cartItems, setCartItems] = useState([]);
   const [loadingCart, setLoadingCart] = useState(true);
   const [updatingKey, setUpdatingKey] = useState(null);
   const [addressMode, setAddressMode] = useState("profile"); // "profile" | "new"
+  const [stateError, setStateError] = useState("");
 
   const {
     register,
     handleSubmit,
+    control,
+    watch,
     formState: { errors, isValid },
   } = useForm({
     defaultValues: {
@@ -50,6 +58,7 @@ const CheckoutPage = () => {
       lastName: "",
       phoneNumber: "",
       country: "",
+      state: "",
       city: "",
       address: "",
       postalCode: "",
@@ -57,6 +66,11 @@ const CheckoutPage = () => {
     resolver: yupResolver(addressSchema),
     mode: "onTouched",
   });
+
+  const selectedCountry = watch("country");
+  const countryNeedsState = countries.find(
+    (c) => c.code === selectedCountry,
+  )?.states;
 
   // redirect to login if not authenticated
   useEffect(() => {
@@ -132,6 +146,12 @@ const CheckoutPage = () => {
   );
 
   const onPlaceOrder = async (newAddressData) => {
+    if (addressMode === "new" && countryNeedsState && !newAddressData.state) {
+      setStateError("State/province is required for this country");
+      return;
+    }
+    setStateError("");
+
     const shippingAddress =
       addressMode === "profile"
         ? {
@@ -139,6 +159,7 @@ const CheckoutPage = () => {
             lastName: session.user.lastName,
             phoneNumber: session.user.phoneNumber,
             country: session.user.country,
+            state: session.user.state || null,
             city: session.user.city,
             address: session.user.address,
             postalCode: session.user.postalCode,
@@ -222,7 +243,7 @@ const CheckoutPage = () => {
                         <span
                           className="inline-block w-4 h-4 rounded-full"
                           style={{
-                            backgroundColor: item.color?.toLowerCase(),
+                            backgroundColor: item.colorHex || "#9ca3af",
                           }}
                         ></span>
                       </span>
@@ -310,6 +331,12 @@ const CheckoutPage = () => {
                     <span className="text-red-900">city : </span>
                     {session.user.city}
                   </p>
+                  {session.user.state && (
+                    <p>
+                      <span className="text-red-900">state : </span>
+                      {session.user.state}
+                    </p>
+                  )}
                   <p>
                     <span className="text-red-900">country : </span>
                     {session.user.country}
@@ -368,23 +395,48 @@ const CheckoutPage = () => {
                 register={register}
               />
               <ProfileInput
-                name="country"
-                label="Country"
-                placeholder="United States"
+                name="postalCode"
+                label="Postal Code"
+                placeholder="1234567890"
                 style="col-span-6"
                 register={register}
               />
+
+              <div className="col-span-6">
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <CountrySelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      label="Country"
+                    />
+                  )}
+                />
+              </div>
+
+              {countryNeedsState && (
+                <div className="col-span-6">
+                  <Controller
+                    name="state"
+                    control={control}
+                    render={({ field }) => (
+                      <StateSelect
+                        countryCode={selectedCountry}
+                        value={field.value}
+                        onChange={field.onChange}
+                        label="State"
+                      />
+                    )}
+                  />
+                </div>
+              )}
+
               <ProfileInput
                 name="city"
                 label="City"
                 placeholder="New York"
-                style="col-span-6"
-                register={register}
-              />
-              <ProfileInput
-                name="postalCode"
-                label="Postal Code"
-                placeholder="1234567890"
                 style="col-span-6"
                 register={register}
               />
