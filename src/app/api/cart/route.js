@@ -28,6 +28,10 @@ export async function GET() {
         image: product?.image || "",
         size: variant?.size || null,
         color: variant?.color || null,
+        colorHex:
+          product?.colorSwatches?.find((s) => s.name === variant?.color)?.hex ||
+          null,
+        catalogVariantId: variant?.variant_id || null,
       };
     });
 

@@ -20,14 +20,14 @@ const CartClient = ({ cartItems }) => {
 
   const removeProductHandler = async (data) => {
     if (!session) {
-      toast.error("Please login first")
+      toast.error("Please login first");
       router.push("/login");
       return;
     }
 
     try {
       const res = await removeProductFromCart({ data });
-      toast.success("Product removed from cart")
+      toast.success("Product removed from cart");
       router.refresh();
     } catch (err) {
       console.log(err.response?.data?.message);
@@ -95,7 +95,6 @@ const CartClient = ({ cartItems }) => {
       </h3>
       <section className="col-span-8 flex flex-col gap-5">
         {cartItems.map((item) => {
-          console.log(item.colorHex)
           const itemKey = `${item.productId}-${item.variantId}`;
           const isUpdating = updatingKey === itemKey;
 
@@ -129,7 +128,7 @@ const CartClient = ({ cartItems }) => {
                         {item.color?.toLowerCase()}
                         <span
                           className="block w-6 h-6 rounded-full shadow-2xs"
-                          style={{backgroundColor:`${item.colorHex}`}}
+                          style={{ backgroundColor: `${item.colorHex}` }}
                         ></span>
                       </span>
                     </div>
@@ -187,7 +186,7 @@ const CartClient = ({ cartItems }) => {
         })}
       </section>
 
-      <section className="col-span-4 h-fit rounded-2xl bg-[#f4ece4] p-6 flex flex-col gap-4">
+      <section className="col-span-4 h-fit sticky top-20 rounded-2xl bg-[#f4ece4] p-6 flex flex-col gap-4">
         <h3 className="text-xl font-semibold">Order Summary</h3>
 
         <div className="flex justify-between text-gray-700">

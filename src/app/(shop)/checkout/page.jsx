@@ -8,16 +8,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
 import {
+  getCartData,
   removeProductFromCart,
   updateProductQuantity,
 } from "@/services/cartServices";
 import { BiDollar } from "react-icons/bi";
 import { FaMinus, FaPlus, FaTrashCan } from "react-icons/fa6";
-import { LuMapPin, LuPlus } from "react-icons/lu";
+import { LuMapPin, LuPlus, LuTruck } from "react-icons/lu";
 import ProfileInput from "@/components/ProfileInput";
 import CountrySelect from "@/components/CountrySelect";
 import StateSelect from "@/components/StateSelect";
 import { useCountries } from "@/lib/useCountries";
+import { getShippingOptions } from "@/services/shippingServices";
 
 const addressSchema = yup
   .object({
@@ -43,14 +45,21 @@ const CheckoutPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loadingCart, setLoadingCart] = useState(true);
   const [updatingKey, setUpdatingKey] = useState(null);
-  const [addressMode, setAddressMode] = useState("profile"); // "profile" | "new"
+  const [addressMode, setAddressMode] = useState("profile");
   const [stateError, setStateError] = useState("");
+
+  const [shippingRates, setShippingRates] = useState([]);
+  const [selectedRateId, setSelectedRateId] = useState(null);
+  const [shippingLoading, setShippingLoading] = useState(false);
+  const [shippingError, setShippingError] = useState("");
 
   const {
     register,
     handleSubmit,
     control,
     watch,
+    trigger,
+    getValues,
     formState: { errors, isValid },
   } = useForm({
     defaultValues: {
@@ -72,14 +81,12 @@ const CheckoutPage = () => {
     (c) => c.code === selectedCountry,
   )?.states;
 
-  // redirect to login if not authenticated
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/login");
     }
   }, [isPending, session, router]);
 
-  // fetch cart
   useEffect(() => {
     if (!session) return;
     fetchCart();
@@ -113,6 +120,7 @@ const CheckoutPage = () => {
         quantity: newQuantity,
       });
       await fetchCart();
+      resetShipping();
     } catch (err) {
       console.error(err);
     } finally {
@@ -126,9 +134,16 @@ const CheckoutPage = () => {
         data: { productId: item.productId, variantId: item.variantId },
       });
       await fetchCart();
+      resetShipping();
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const resetShipping = () => {
+    setShippingRates([]);
+    setSelectedRateId(null);
+    setShippingError("");
   };
 
   const subtotal = cartItems.reduce(
@@ -145,7 +160,107 @@ const CheckoutPage = () => {
     session?.user?.phoneNumber,
   );
 
+  const buildShippingItems = () => {
+    const items = cartItems
+      .filter((i) => i.catalogVariantId)
+      .map((i) => ({ variant_id: i.catalogVariantId, quantity: i.quantity }));
+
+    if (items.length !== cartItems.length) {
+      console.warn("Some cart items are missing a catalog variant id");
+    }
+    return items;
+  };
+
+  const calculateShipping = async (address) => {
+    setShippingLoading(true);
+    setShippingError("");
+    setShippingRates([]);
+    setSelectedRateId(null);
+
+    const dataToSend = {
+      recipient: {
+        country_code: address.country,
+        state_code: address.state || undefined,
+        city: address.city,
+        zip: address.postalCode,
+        address1: address.address1 || address.address,
+        phone: address.phone || address.phoneNumber,
+      },
+      items: buildShippingItems(),
+    };
+
+    try {
+      const result = await getShippingOptions(dataToSend);
+
+      if (!result.success) {
+        throw new Error(
+          result.error || result.message || "Could not calculate shipping",
+        );
+      }
+
+      setShippingRates(result.data);
+      if (result.data.length > 0) {
+        setSelectedRateId(result.data[0].id);
+      }
+    } catch (err) {
+      setShippingError(err.message);
+    } finally {
+      setShippingLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      addressMode === "profile" &&
+      hasProfileAddress &&
+      cartItems.length > 0
+    ) {
+      calculateShipping({
+        country: session.user.country,
+        state: session.user.state,
+        city: session.user.city,
+        postalCode: session.user.postalCode,
+        address1: session.user.address || "",
+        phone: session.user.phoneNumber || "",
+      });
+    } else if (addressMode === "profile") {
+      resetShipping();
+    }
+  }, [addressMode, cartItems.length]);
+
+  const handleCalculateNewAddressShipping = async () => {
+    const valid = await trigger(["country", "state", "city", "postalCode"]);
+
+    const values = getValues();
+
+    if (countryNeedsState && !values.state) {
+      setStateError("State/province is required for this country");
+      return;
+    }
+    setStateError("");
+
+    if (!valid) return;
+
+    await calculateShipping({
+      country: values.country,
+      state: values.state,
+      city: values.city,
+      postalCode: values.postalCode,
+      address1: values.address || "",
+      phone: values.phoneNumber || "",
+    });
+  };
+
+  const selectedRate = shippingRates.find((r) => r.id === selectedRateId);
+  const shippingCost = selectedRate ? Number(selectedRate.rate) : 0;
+  const total = subtotal + shippingCost;
+
   const onPlaceOrder = async (newAddressData) => {
+    if (!selectedRateId) {
+      setShippingError("Please calculate and select a shipping method first");
+      return;
+    }
+
     if (addressMode === "new" && countryNeedsState && !newAddressData.state) {
       setStateError("State/province is required for this country");
       return;
@@ -173,16 +288,16 @@ const CheckoutPage = () => {
         quantity: item.quantity,
       })),
       shippingAddress,
-      totalPrice: subtotal,
+      shippingMethod: selectedRate,
+      totalPrice: total,
     };
 
-    // TODO: send orderPayload to the payment gateway / order creation endpoint once ready
     console.log("Ready to send to payment gateway:", orderPayload);
   };
 
   if (isPending || loadingCart) {
     return (
-      <main className="flex justify-center items-center min-h-screen bg-[#f4ece4]">
+      <main className="flex justify-center items-center min-h-scree">
         <p>Loading...</p>
       </main>
     );
@@ -190,7 +305,7 @@ const CheckoutPage = () => {
 
   if (cartItems.length === 0) {
     return (
-      <main className="flex flex-col justify-center items-center min-h-screen bg-[#f4ece4] gap-y-4">
+      <main className="flex flex-col justify-center items-center min-h-screen gap-y-4">
         <h1 className="text-2xl font-semibold">Your cart is empty</h1>
         <Link href="/products" className="text-red-900 underline">
           Continue shopping
@@ -205,9 +320,7 @@ const CheckoutPage = () => {
         Checkout ( <span className="text-red-900">{totalQuantity}</span> )
       </h1>
 
-      {/* ==================== LEFT: items + address ==================== */}
       <section className="col-span-8 flex flex-col gap-8">
-        {/* ---- items list ---- */}
         <div className="flex flex-col gap-y-5">
           {cartItems.map((item) => {
             const itemKey = `${item.productId}-${item.variantId}`;
@@ -240,12 +353,7 @@ const CheckoutPage = () => {
                       </span>
                       <span className="flex items-center gap-x-1">
                         color:
-                        <span
-                          className="inline-block w-4 h-4 rounded-full"
-                          style={{
-                            backgroundColor: item.colorHex || "#9ca3af",
-                          }}
-                        ></span>
+                        <span className="text-sm">{item.color}</span>
                       </span>
                     </div>
                   </div>
@@ -297,79 +405,85 @@ const CheckoutPage = () => {
           })}
         </div>
 
-        {/* ---- address selection ---- */}
         <div className="rounded-xl bg-[#f4ece4] p-6 flex flex-col gap-y-5">
           <h3 className="text-lg font-semibold flex items-center gap-x-2">
             <LuMapPin className="mb-1 text-xl text-red-900" /> Shipping Address
           </h3>
+          <div className="grid grid-cols-12 gap-4">
+            {hasProfileAddress && (
+              <label
+                className={`bg-[#f4ece4] col-span-6 flex items-start gap-x-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                  addressMode === "profile"
+                    ? "border-red-900"
+                    : "border-transparent"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="addressMode"
+                  checked={addressMode === "profile"}
+                  onChange={() => {
+                    setAddressMode("profile");
+                    resetShipping();
+                  }}
+                  className="mt-1 accent-red-900"
+                />
+                <div className="flex flex-col gap-y-1">
+                  <p className="font-semibold">
+                    {session.user.firstName} {session.user.lastName}
+                  </p>
+                  <div className="text-sm text-gray-600 flex flex-col gap-y-1">
+                    <p>
+                      <span className="text-red-900">address : </span>
+                      {session.user.address.slice(0, 20) + "..."}
+                    </p>
+                    <p>
+                      <span className="text-red-900">city : </span>
+                      {session.user.city}
+                    </p>
+                    {session.user.state && (
+                      <p>
+                        <span className="text-red-900">state : </span>
+                        {session.user.state}
+                      </p>
+                    )}
+                    <p>
+                      <span className="text-red-900">country : </span>
+                      {session.user.country}
+                    </p>
+                    <p>
+                      <span className="text-red-900">postal code : </span>
+                      {session.user.postalCode}
+                    </p>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    <span className="text-red-900">phone number : </span>
+                    {session.user.phoneNumber}
+                  </p>
+                </div>
+              </label>
+            )}
 
-          {hasProfileAddress && (
             <label
-              className={`bg-[#f4ece4] flex items-start gap-x-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                addressMode === "profile"
-                  ? "border-red-900"
-                  : "border-transparent"
+              className={`bg-[#f4ece4] col-span-6 flex items-center gap-x-3 p-4 border-2  rounded-xl cursor-pointer transition-all duration-300 ${
+                addressMode === "new" ? " border-red-900" : "border-transparent"
               }`}
             >
               <input
                 type="radio"
                 name="addressMode"
-                checked={addressMode === "profile"}
-                onChange={() => setAddressMode("profile")}
-                className="mt-1 accent-red-900"
+                checked={addressMode === "new"}
+                onChange={() => {
+                  setAddressMode("new");
+                  resetShipping();
+                }}
+                className="accent-red-900"
               />
-              <div className="flex flex-col gap-y-1">
-                <p className="font-semibold">
-                  {session.user.firstName} {session.user.lastName}
-                </p>
-                <div className="text-sm text-gray-600 flex flex-col gap-y-1">
-                  <p>
-                    <span className="text-red-900">address : </span>
-                    {session.user.address}
-                  </p>
-                  <p>
-                    <span className="text-red-900">city : </span>
-                    {session.user.city}
-                  </p>
-                  {session.user.state && (
-                    <p>
-                      <span className="text-red-900">state : </span>
-                      {session.user.state}
-                    </p>
-                  )}
-                  <p>
-                    <span className="text-red-900">country : </span>
-                    {session.user.country}
-                  </p>
-                  <p>
-                    <span className="text-red-900">postal code : </span>
-                    {session.user.postalCode}
-                  </p>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  <span className="text-red-900">phone number : </span>
-                  {session.user.phoneNumber}
-                </p>
-              </div>
+              <span className="flex items-center gap-x-2 font-semibold">
+                <LuPlus /> Add new address
+              </span>
             </label>
-          )}
-
-          <label
-            className={`bg-[#f4ece4] flex items-center gap-x-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-              addressMode === "new" ? "border-red-900" : "border-transparent"
-            }`}
-          >
-            <input
-              type="radio"
-              name="addressMode"
-              checked={addressMode === "new"}
-              onChange={() => setAddressMode("new")}
-              className="accent-red-900"
-            />
-            <span className="flex items-center gap-x-2 font-semibold">
-              <LuPlus /> Add new address
-            </span>
-          </label>
+          </div>
 
           {addressMode === "new" && (
             <div className="grid grid-cols-12 gap-4 mt-2">
@@ -455,13 +569,70 @@ const CheckoutPage = () => {
                   className="w-full resize-none h-32 outline-none rounded-xl border border-[#dfcec6] py-2 px-4 bg-[#FDF8F6] focus:border-red-900"
                 />
               </div>
+
+              <div className="col-span-12 flex justify-end mt-5">
+                <button
+                  type="button"
+                  onClick={handleCalculateNewAddressShipping}
+                  disabled={shippingLoading || !isValid}
+                  className="cursor-pointer flex items-center gap-x-2 px-4 py-2 rounded-full border-2 border-red-900 text-red-900 font-semibold hover:bg-red-900 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <LuTruck />
+                  {shippingLoading
+                    ? "Calculating..."
+                    : "Calculate shipping cost"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {shippingError && (
+            <p className="text-red-600 text-sm text-center mt-10">
+              {shippingError}
+            </p>
+          )}
+
+          {shippingRates.length > 0 && (
+            <div className="flex flex-col gap-y-2 mt-2">
+              <p className="font-semibold text-sm mb-3">Shipping method:</p>
+              {shippingRates.map((rate) => (
+                <label
+                  key={rate.id}
+                  className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                    selectedRateId === rate.id
+                      ? "border-red-900 bg-[#FDF8F6]"
+                      : "border-transparent bg-white/50"
+                  }`}
+                >
+                  <span className="flex items-center gap-x-3">
+                    <input
+                      type="radio"
+                      name="shippingRate"
+                      checked={selectedRateId === rate.id}
+                      onChange={() => setSelectedRateId(rate.id)}
+                      className="accent-red-900"
+                    />
+                    <span>
+                      <span className="font-medium">{rate.name}</span>
+                      {rate.minDeliveryDays && (
+                        <span className="text-sm text-gray-500 block">
+                          {rate.minDeliveryDays}-{rate.maxDeliveryDays} days
+                        </span>
+                      )}
+                    </span>
+                  </span>
+                  <span className="font-semibold flex items-center">
+                    <BiDollar className="text-red-900" />
+                    {rate.rate}
+                  </span>
+                </label>
+              ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* ==================== RIGHT: summary ==================== */}
-      <section className="col-span-4 h-fit rounded-2xl bg-[#f4ece4] p-6 flex flex-col gap-4">
+      <section className="col-span-4 h-fit sticky top-20 rounded-2xl bg-[#f4ece4] p-6 flex flex-col gap-4">
         <h3 className="text-xl font-semibold">Order Summary</h3>
 
         <div className="flex justify-between text-gray-700">
@@ -479,7 +650,16 @@ const CheckoutPage = () => {
 
         <div className="flex justify-between text-gray-700">
           <span>Shipping</span>
-          <span className="text-sm">Calculated at payment</span>
+          <span className="flex items-center">
+            {selectedRate ? (
+              <>
+                <BiDollar className="text-red-900 mb-1" />
+                {shippingCost.toFixed(2)}
+              </>
+            ) : (
+              <span className="text-sm">Not calculated yet</span>
+            )}
+          </span>
         </div>
 
         <hr className="border-red-900/20" />
@@ -488,7 +668,7 @@ const CheckoutPage = () => {
           <span>Total</span>
           <span className="flex items-center">
             <BiDollar className="text-red-900 mb-1.5" />
-            {subtotal.toFixed(2)}
+            {total.toFixed(2)}
           </span>
         </div>
 
@@ -498,7 +678,7 @@ const CheckoutPage = () => {
               ? () => onPlaceOrder()
               : handleSubmit(onPlaceOrder)
           }
-          disabled={addressMode === "new" && !isValid}
+          disabled={(addressMode === "new" && !isValid) || !selectedRateId}
           className="w-full rounded-full text-white text-lg font-semibold bg-red-900 py-2 mt-2 transition-all duration-300 hover:bg-red-950 disabled:cursor-not-allowed disabled:opacity-45"
         >
           Proceed to Payment
