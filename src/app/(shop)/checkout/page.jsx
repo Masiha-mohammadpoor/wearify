@@ -20,6 +20,8 @@ import CountrySelect from "@/components/CountrySelect";
 import StateSelect from "@/components/StateSelect";
 import { useCountries } from "@/lib/useCountries";
 import { getShippingOptions } from "@/services/shippingServices";
+import { isValidPhoneNumber } from "react-phone-number-input";
+import PhoneNumberInput from "@/components/PhoneInput";
 
 const addressSchema = yup
   .object({
@@ -28,7 +30,9 @@ const addressSchema = yup
     phoneNumber: yup
       .string()
       .required("Phone number is required")
-      .matches(/^\+[1-9]\d{7,14}$/, "Phone number must include country code"),
+      .test("is-valid-phone", "Please enter a valid phone number", (value) =>
+        value ? isValidPhoneNumber(value) : false,
+      ),
     country: yup.string().required("Country is required"),
     state: yup.string().nullable(),
     city: yup.string().required("City is required"),
@@ -501,13 +505,20 @@ const CheckoutPage = () => {
                 style="col-span-6"
                 register={register}
               />
-              <ProfileInput
-                name="phoneNumber"
-                label="Phone Number"
-                placeholder="+1234567890"
-                style="col-span-6"
-                register={register}
-              />
+              <div className="col-span-6">
+                <Controller
+                  name="phoneNumber"
+                  control={control}
+                  render={({ field }) => (
+                    <PhoneNumberInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      defaultCountry={selectedCountry || undefined}
+                      label="Phone Number"
+                    />
+                  )}
+                />
+              </div>
               <ProfileInput
                 name="postalCode"
                 label="Postal Code"

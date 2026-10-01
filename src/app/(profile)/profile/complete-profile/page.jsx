@@ -12,37 +12,26 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useCountries } from "@/lib/useCountries";
 import { TiWarning, TiTick } from "react-icons/ti";
+import { isValidPhoneNumber } from "react-phone-number-input";
+import PhoneNumberInput from "@/components/PhoneInput";
 
-const schema = yup.object({
-  firstName: yup.string().required("First name is required"),
-  lastName: yup.string().required("Last name is required"),
-  email: yup
-    .string()
-    .required("Email is required")
-    .email("Please enter a valid email"),
-  phoneNumber: yup
-    .string()
-    .required("Phone number is required")
-    .matches(/^\+[1-9]\d{7,14}$/, {
-      message: "Phone number must include country code",
-      excludeEmptyString: true,
-    })
-    .typeError("Phone number must be a string"),
-  country: yup.string().required("Country is required"),
-  state: yup.string().nullable(),
-  city: yup
-    .string()
-    .required("City is required")
-    .typeError("City must be a string"),
-  address: yup
-    .string()
-    .required("Address is required")
-    .typeError("Address must be a string"),
-  postalCode: yup
-    .string()
-    .required("Postal code is required")
-    .typeError("Postal code must be a string"),
-});
+const schema = yup
+  .object({
+    firstName: yup.string().required("First name is required"),
+    lastName: yup.string().required("Last name is required"),
+    phoneNumber: yup
+      .string()
+      .required("Phone number is required")
+      .test("is-valid-phone", "Please enter a valid phone number", (value) =>
+        value ? isValidPhoneNumber(value) : false,
+      ),
+    country: yup.string().required("Country is required"),
+    state: yup.string().nullable(),
+    city: yup.string().required("City is required"),
+    address: yup.string().required("Address is required"),
+    postalCode: yup.string().required("Postal code is required"),
+  })
+  .required();
 
 const CompleteProfile = () => {
   const { data: session, isPending } = useSession();
@@ -221,13 +210,20 @@ const CompleteProfile = () => {
             </span>
             <h3 className="font-semibold text-lg">Contact Information</h3>
           </div>
-          <ProfileInput
-            name="phoneNumber"
-            label="Phone Number"
-            placeholder="+1234567890"
-            style="col-span-6"
-            register={register}
-          />
+          <div className="col-span-6">
+            <Controller
+              name="phoneNumber"
+              control={control}
+              render={({ field }) => (
+                <PhoneNumberInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  defaultCountry={selectedCountry || undefined}
+                  label="Phone Number"
+                />
+              )}
+            />
+          </div>
           <ProfileInput
             name="email"
             label="Email"
