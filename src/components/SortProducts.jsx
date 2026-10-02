@@ -1,20 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { selectStyles } from "@/constants/selectStyles";
 import { FaSortAmountDown } from "react-icons/fa";
 import dynamic from "next/dynamic";
 const Select = dynamic(() => import("react-select"), { ssr: false });
 
 const options = [
-  { value: "newest", label: "Newest" },
-  { value: "oldest", label: "Oldest" },
-  { value: "lth", label: "Low To Hight 💵" },
-  { value: "htl", label: "Hight To Low 💵" },
+  { value: "price_asc", label: "Low To High 💵" },
+  { value: "price_desc", label: "High To Low 💵" },
 ];
 
 const SortProducts = () => {
-  const [sort, setSort] = useState(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const currentSort = searchParams.get("sort");
+  const selectedOption = options.find((o) => o.value === currentSort) || null;
+
+  const handleChange = (option) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (!option) {
+      params.delete("sort");
+    } else {
+      params.set("sort", option.value);
+    }
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   return (
     <section className="col-span-12 flex justify-end items-center gap-3 px-5 mb-3">
@@ -24,9 +39,10 @@ const SortProducts = () => {
         </span>
         <Select
           options={options}
-          onChange={setSort}
-          defaultValue={sort}
-          value={sort}
+          isSearchable={false}
+          onChange={handleChange}
+          value={selectedOption}
+          isClearable
           menuPlacement="auto"
           placeholder="select..."
           styles={selectStyles}
