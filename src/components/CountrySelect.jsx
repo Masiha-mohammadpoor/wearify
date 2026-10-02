@@ -3,7 +3,7 @@ import Select from "react-select";
 import { useCountries } from "@/lib/useCountries";
 import { selectStyles } from "@/constants/selectStyles";
 
-const CountrySelect = ({ value, onChange, label }) => {
+const CountrySelect = ({ value, onChange,onBlur, label, error }) => {
   const { countries, loading } = useCountries();
 
   const options = countries.map((c) => ({
@@ -25,9 +25,15 @@ const CountrySelect = ({ value, onChange, label }) => {
         isLoading={loading}
         styles={selectStyles}
         onChange={(option) => onChange(option?.value || "")}
+        onBlur={onBlur}
         isSearchable
         isClearable
       />
+      {error ? (
+        <p className="text-xs text-red-500 mt-1.5 ml-1">{error}</p>
+      ) : (
+        <p className="text-xs text-transparent mt-1.5 ml-1">.</p>
+      )}
     </div>
   );
 };

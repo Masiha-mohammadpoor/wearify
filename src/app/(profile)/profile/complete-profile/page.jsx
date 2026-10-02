@@ -192,6 +192,7 @@ const CompleteProfile = () => {
             placeholder="John"
             style="col-span-6"
             register={register}
+            error={errors["firstName"]?.message}
           />
           <ProfileInput
             name="lastName"
@@ -199,6 +200,7 @@ const CompleteProfile = () => {
             placeholder="Doe"
             style="col-span-6"
             register={register}
+            error={errors["lastName"]?.message}
           />
         </article>
 
@@ -218,8 +220,10 @@ const CompleteProfile = () => {
                 <PhoneNumberInput
                   value={field.value}
                   onChange={field.onChange}
+                  onBlur={field.onBlur}
                   defaultCountry={selectedCountry || undefined}
                   label="Phone Number"
+                  error={errors["phoneNumber"]?.message}
                 />
               )}
             />
@@ -231,6 +235,7 @@ const CompleteProfile = () => {
             placeholder="john.doe@example.com"
             style="col-span-10"
             register={register}
+            error={errors["email"]?.message}
           />
         </article>
 
@@ -253,7 +258,8 @@ const CompleteProfile = () => {
                   label="Country"
                   value={field.value}
                   onChange={field.onChange}
-                  error={errors.country?.message}
+                  onBlur={field.onBlur}
+                  error={errors["country"]?.message}
                 />
               )}
             />
@@ -272,6 +278,7 @@ const CompleteProfile = () => {
                       countryCode={selectedCountry}
                       value={field.value}
                       onChange={field.onChange}
+                      onBlur={field.onBlur}
                       error={stateError}
                     />
                   )}
@@ -286,6 +293,15 @@ const CompleteProfile = () => {
             placeholder="New York"
             style="col-span-6"
             register={register}
+            error={errors["city"]?.message}
+          />
+          <ProfileInput
+            name="postalCode"
+            label="Postal Code"
+            placeholder="1234567890"
+            style="col-span-6"
+            register={register}
+            error={errors["postalCode"]?.message}
           />
 
           <div className="flex flex-col items-start col-span-12">
@@ -302,15 +318,14 @@ const CompleteProfile = () => {
               {...register("address")}
               className="w-full resize-none h-32 outline-none rounded-xl border border-[#dfcec6] py-2 px-4 bg-[#FDF8F6] focus:border-red-900"
             />
+            {errors["address"]?.message ? (
+              <p className="text-xs text-red-500 mt-1.5 ml-1">
+                {errors["address"]?.message}
+              </p>
+            ) : (
+              <p className="text-xs text-transparent mt-1.5 ml-1">.</p>
+            )}
           </div>
-
-          <ProfileInput
-            name="postalCode"
-            label="Postal Code"
-            placeholder="1234567890"
-            style="col-span-6"
-            register={register}
-          />
         </article>
 
         {/* =================== Save Button ==================== */}

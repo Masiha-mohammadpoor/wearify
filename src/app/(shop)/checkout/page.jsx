@@ -320,95 +320,17 @@ const CheckoutPage = () => {
 
   return (
     <main className="grid grid-cols-12 gap-8 mt-10 mx-20">
-      <h1 className="col-span-12 text-xl font-semibold">
-        Checkout ( <span className="text-red-900">{totalQuantity}</span> )
-      </h1>
-
+      <div className="col-span-12 flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Checkout</h1>
+        <a
+          href="#products-list"
+          className="flex items-center gap-x-2 px-4 py-2 rounded-full border-2 border-red-900 text-red-900 font-semibold text-sm hover:bg-red-900 hover:text-white transition-all duration-300"
+        >
+          View items ({totalQuantity}) ↓
+        </a>
+      </div>
       <section className="col-span-8 flex flex-col gap-8">
-        <div className="flex flex-col gap-y-5">
-          {cartItems.map((item) => {
-            const itemKey = `${item.productId}-${item.variantId}`;
-            const isUpdating = updatingKey === itemKey;
-
-            return (
-              <article
-                key={itemKey}
-                className="w-full rounded-2xl bg-[#f4ece4] p-3 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-x-5">
-                  <div className="w-24 h-24 rounded-2xl relative bg-red-300 overflow-hidden">
-                    <Image
-                      src={item.image}
-                      alt={`${item.name} image`}
-                      fill
-                      className="object-fill absolute"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-between h-24 py-1">
-                    <h4 className="font-semibold text-lg">{item.name}</h4>
-                    <span className="font-semibold flex items-center gap-x-0.5">
-                      <BiDollar className="text-red-900 mb-1.5" />
-                      {item.price}
-                    </span>
-                    <div className="flex items-center gap-x-3 text-sm">
-                      <span>
-                        size:
-                        <span className="text-red-900">{item.size}</span>
-                      </span>
-                      <span className="flex items-center gap-x-1">
-                        color:
-                        <span className="text-sm">{item.color}</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-x-4">
-                  <div className="h-8 flex overflow-hidden rounded-xl">
-                    <button
-                      onClick={() =>
-                        updateQuantityHandler(item, item.quantity - 1)
-                      }
-                      disabled={isUpdating || item.quantity <= 1}
-                      className="w-8 flex justify-center items-center bg-red-800 hover:bg-red-900 transition duration-300 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <FaMinus size={12} />
-                    </button>
-                    <input
-                      type="number"
-                      min={1}
-                      disabled={isUpdating}
-                      onChange={(e) => {
-                        const val =
-                          e.target.value === "" ? 1 : Number(e.target.value);
-                        updateQuantityHandler(item, Math.max(1, val));
-                      }}
-                      value={item.quantity}
-                      className="outline-none border-2 border-red-800 w-12 text-center text-lg text-red-900 font-semibold"
-                    />
-                    <button
-                      onClick={() =>
-                        updateQuantityHandler(item, item.quantity + 1)
-                      }
-                      disabled={isUpdating}
-                      className="w-8 flex justify-center items-center bg-red-800 hover:bg-red-900 transition duration-300 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <FaPlus size={12} />
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => removeItemHandler(item)}
-                    className="text-lg px-2 cursor-pointer"
-                  >
-                    <FaTrashCan className="text-red-500 hover:text-red-800 transition duration-150" />
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-
+        {/* =============== Addrss ================ */}
         <div className="rounded-xl bg-[#f4ece4] p-6 flex flex-col gap-y-5">
           <h3 className="text-lg font-semibold flex items-center gap-x-2">
             <LuMapPin className="mb-1 text-xl text-red-900" /> Shipping Address
@@ -497,6 +419,7 @@ const CheckoutPage = () => {
                 placeholder="John"
                 style="col-span-6"
                 register={register}
+                error={errors["firstName"]?.message}
               />
               <ProfileInput
                 name="lastName"
@@ -504,6 +427,7 @@ const CheckoutPage = () => {
                 placeholder="Doe"
                 style="col-span-6"
                 register={register}
+                error={errors["lastName"]?.message}
               />
               <div className="col-span-6">
                 <Controller
@@ -513,8 +437,10 @@ const CheckoutPage = () => {
                     <PhoneNumberInput
                       value={field.value}
                       onChange={field.onChange}
+                      onBlur={field.onBlur}
                       defaultCountry={selectedCountry || undefined}
                       label="Phone Number"
+                      error={errors["phoneNumber"]?.message}
                     />
                   )}
                 />
@@ -525,6 +451,7 @@ const CheckoutPage = () => {
                 placeholder="1234567890"
                 style="col-span-6"
                 register={register}
+                error={errors["postalCode"]?.message}
               />
 
               <div className="col-span-6">
@@ -535,7 +462,9 @@ const CheckoutPage = () => {
                     <CountrySelect
                       value={field.value}
                       onChange={field.onChange}
+                      onBlur={field.onBlur}
                       label="Country"
+                      error={errors["country"]?.message}
                     />
                   )}
                 />
@@ -552,6 +481,8 @@ const CheckoutPage = () => {
                         value={field.value}
                         onChange={field.onChange}
                         label="State"
+                        onBlur={field.onBlur}
+                        error={stateError}
                       />
                     )}
                   />
@@ -564,6 +495,7 @@ const CheckoutPage = () => {
                 placeholder="New York"
                 style="col-span-6"
                 register={register}
+                error={errors["city"]?.message}
               />
               <div className="flex flex-col items-start col-span-12">
                 <label
@@ -579,6 +511,13 @@ const CheckoutPage = () => {
                   {...register("address")}
                   className="w-full resize-none h-32 outline-none rounded-xl border border-[#dfcec6] py-2 px-4 bg-[#FDF8F6] focus:border-red-900"
                 />
+                {errors["address"]?.message ? (
+                  <p className="text-xs text-red-500 mt-1.5 ml-1">
+                    {errors["address"]?.message}
+                  </p>
+                ) : (
+                  <p className="text-xs text-transparent mt-1.5 ml-1">.</p>
+                )}
               </div>
 
               <div className="col-span-12 flex justify-end mt-5">
@@ -640,6 +579,94 @@ const CheckoutPage = () => {
               ))}
             </div>
           )}
+        </div>
+        {/* ================= Products =================== */}
+        <div id="products-list" className="flex flex-col gap-y-5 scroll-mt-24">
+          <h1 className="text-xl font-semibold">
+            Your Product
+            <span className="text-red-900"> ( {totalQuantity} )</span>
+          </h1>
+          {cartItems.map((item) => {
+            const itemKey = `${item.productId}-${item.variantId}`;
+            const isUpdating = updatingKey === itemKey;
+
+            return (
+              <article
+                key={itemKey}
+                className="w-full rounded-2xl bg-[#f4ece4] p-3 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-x-5">
+                  <div className="w-24 h-24 rounded-2xl relative bg-red-300 overflow-hidden">
+                    <Image
+                      src={item.image}
+                      alt={`${item.name} image`}
+                      fill
+                      className="object-fill absolute"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-between h-24 py-1">
+                    <h4 className="font-semibold text-lg">{item.name}</h4>
+                    <span className="font-semibold flex items-center gap-x-0.5">
+                      <BiDollar className="text-red-900 mb-1.5" />
+                      {item.price}
+                    </span>
+                    <div className="flex items-center gap-x-3 text-sm">
+                      <span>
+                        size:
+                        <span className="text-red-900">{item.size}</span>
+                      </span>
+                      <span className="flex items-center gap-x-1">
+                        color:
+                        <span className="text-sm">{item.color}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-x-4">
+                  <div className="h-8 flex overflow-hidden rounded-xl">
+                    <button
+                      onClick={() =>
+                        updateQuantityHandler(item, item.quantity - 1)
+                      }
+                      disabled={isUpdating || item.quantity <= 1}
+                      className="w-8 flex justify-center items-center bg-red-800 hover:bg-red-900 transition duration-300 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <FaMinus size={12} />
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      disabled={isUpdating}
+                      onChange={(e) => {
+                        const val =
+                          e.target.value === "" ? 1 : Number(e.target.value);
+                        updateQuantityHandler(item, Math.max(1, val));
+                      }}
+                      value={item.quantity}
+                      className="outline-none border-2 border-red-800 w-12 text-center text-lg text-red-900 font-semibold"
+                    />
+                    <button
+                      onClick={() =>
+                        updateQuantityHandler(item, item.quantity + 1)
+                      }
+                      disabled={isUpdating}
+                      className="w-8 flex justify-center items-center bg-red-800 hover:bg-red-900 transition duration-300 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <FaPlus size={12} />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => removeItemHandler(item)}
+                    className="text-lg px-2 cursor-pointer"
+                  >
+                    <FaTrashCan className="text-red-500 hover:text-red-800 transition duration-150" />
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 

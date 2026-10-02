@@ -3,7 +3,7 @@ import Select from "react-select";
 import { useCountries } from "@/lib/useCountries";
 import { selectStyles } from "@/constants/selectStyles";
 
-const StateSelect = ({ countryCode, value, onChange , label}) => {
+const StateSelect = ({ countryCode, value, onChange , onBlur , label, error }) => {
   const { countries } = useCountries();
   const country = countries.find((c) => c.code === countryCode);
   const states = country?.states || null;
@@ -27,9 +27,15 @@ const StateSelect = ({ countryCode, value, onChange , label}) => {
         placeholder="Select state/province"
         styles={selectStyles}
         onChange={(option) => onChange(option?.value || "")}
+        onBlur={onBlur}
         isSearchable
         isClearable
       />
+      {error ? (
+        <p className="text-xs text-red-500 mt-1.5 ml-1">{error}</p>
+      ) : (
+        <p className="text-xs text-transparent mt-1.5 ml-1">.</p>
+      )}
     </div>
   );
 };

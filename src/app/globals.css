@@ -10,3 +10,21 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #82181a;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6c1214;
+}
