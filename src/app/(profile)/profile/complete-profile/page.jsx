@@ -14,6 +14,9 @@ import { useCountries } from "@/lib/useCountries";
 import { TiWarning, TiTick } from "react-icons/ti";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import PhoneNumberInput from "@/components/PhoneInput";
+import Loading from "@/components/Loading";
+
+const MIN_LOADING_TIME = 1500;
 
 const schema = yup
   .object({
@@ -38,6 +41,22 @@ const CompleteProfile = () => {
   const router = useRouter();
   const { countries } = useCountries();
   const [stateError, setStateError] = useState("");
+  const [minTimePassed, setMinTimePassed] = useState(false);
+
+  useEffect(() => {
+    const hasSeen = sessionStorage.getItem("profile-loaded");
+    if (hasSeen) {
+      setMinTimePassed(true);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setMinTimePassed(true);
+      sessionStorage.setItem("profile-loaded", "1");
+    }, MIN_LOADING_TIME);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const {
     register,
@@ -132,7 +151,14 @@ const CompleteProfile = () => {
       })
     : null;
 
-  if (isPending) return <p>Loading...</p>;
+  const showLoading = isPending || !minTimePassed;
+
+  if (showLoading)
+    return (
+      <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8 h-screen overflow-y-scroll">
+        <Loading />
+      </main>
+    );
 
   return (
     <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8 h-screen overflow-y-scroll pb-15">
@@ -143,7 +169,6 @@ const CompleteProfile = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="w-full bg-[#f4ece4] rounded-xl p-10 flex flex-col gap-y-10"
       >
-        {/* ================== Avatar =================== */}
         <article className="flex justify-start items-center gap-x-5">
           <div className="w-30 h-30 rounded-full text-white bg-red-900 flex justify-center items-center text-3xl font-bold">
             {avatarLetter}
@@ -178,7 +203,6 @@ const CompleteProfile = () => {
         </article>
         <span className="w-full h-px bg-[#dfcec6]"></span>
 
-        {/* =============== Personal Info =============== */}
         <article className="grid gid-cols-12 gap-y-7 gap-x-8">
           <div className="col-span-12 flex items-center gap-x-4">
             <span className="inline-block rounded-xl bg-[#FDF8F6] p-3 shadow-xl text-xl text-red-900">
@@ -204,7 +228,6 @@ const CompleteProfile = () => {
           />
         </article>
 
-        {/* ================ Contact Info =============== */}
         <article className="grid gid-cols-12 gap-y-7 gap-x-8">
           <div className="col-span-12 flex items-center gap-x-4">
             <span className="inline-block rounded-xl bg-[#FDF8F6] p-3 shadow-xl text-xl text-red-900">
@@ -239,7 +262,6 @@ const CompleteProfile = () => {
           />
         </article>
 
-        {/* =================== Location ===================== */}
         <article className="grid gid-cols-12 gap-y-7 gap-x-8">
           <div className="col-span-12 flex items-center gap-x-4">
             <span className="inline-block rounded-xl bg-[#FDF8F6] p-3 shadow-xl text-xl text-red-900">
@@ -328,7 +350,6 @@ const CompleteProfile = () => {
           </div>
         </article>
 
-        {/* =================== Save Button ==================== */}
         <span className="w-full h-px bg-[#dfcec6]"></span>
         <div className="w-full flex justify-end">
           <button

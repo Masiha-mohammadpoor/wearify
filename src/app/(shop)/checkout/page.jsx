@@ -22,6 +22,9 @@ import { useCountries } from "@/lib/useCountries";
 import { getShippingOptions } from "@/services/shippingServices";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import PhoneNumberInput from "@/components/PhoneInput";
+import Loading from "@/components/Loading";
+
+const MIN_LOADING_TIME = 1500;
 
 const addressSchema = yup
   .object({
@@ -51,11 +54,27 @@ const CheckoutPage = () => {
   const [updatingKey, setUpdatingKey] = useState(null);
   const [addressMode, setAddressMode] = useState("profile");
   const [stateError, setStateError] = useState("");
+  const [minTimePassed, setMinTimePassed] = useState(false);
 
   const [shippingRates, setShippingRates] = useState([]);
   const [selectedRateId, setSelectedRateId] = useState(null);
   const [shippingLoading, setShippingLoading] = useState(false);
   const [shippingError, setShippingError] = useState("");
+
+  useEffect(() => {
+    const hasSeen = sessionStorage.getItem("checkout-loaded");
+    if (hasSeen) {
+      setMinTimePassed(true);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setMinTimePassed(true);
+      sessionStorage.setItem("checkout-loaded", "1");
+    }, MIN_LOADING_TIME);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const {
     register,
@@ -299,10 +318,12 @@ const CheckoutPage = () => {
     console.log("Ready to send to payment gateway:", orderPayload);
   };
 
-  if (isPending || loadingCart) {
+  const showLoading = isPending || loadingCart || !minTimePassed;
+
+  if (showLoading) {
     return (
-      <main className="flex justify-center items-center min-h-scree">
-        <p>Loading...</p>
+      <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8 h-screen overflow-y-scroll">
+        <Loading />
       </main>
     );
   }
@@ -330,7 +351,6 @@ const CheckoutPage = () => {
         </a>
       </div>
       <section className="col-span-8 flex flex-col gap-8">
-        {/* =============== Addrss ================ */}
         <div className="rounded-xl bg-[#f4ece4] p-6 flex flex-col gap-y-5">
           <h3 className="text-lg font-semibold flex items-center gap-x-2">
             <LuMapPin className="mb-1 text-xl text-red-900" /> Shipping Address
@@ -580,7 +600,6 @@ const CheckoutPage = () => {
             </div>
           )}
         </div>
-        {/* ================= Products =================== */}
         <div
           id="products-list"
           className="flex flex-col gap-y-5 scroll-mt-24  mb-15"

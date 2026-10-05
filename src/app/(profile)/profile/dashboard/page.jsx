@@ -3,6 +3,7 @@ import DashboardCard from "@/components/DashboardCard";
 import PersonalInfoItem from "@/components/PersonalInfoItem";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
+import { useEffect, useState } from "react";
 import {
   LuCalendar,
   LuMapPin,
@@ -13,14 +14,25 @@ import {
 } from "react-icons/lu";
 import { HiOutlineMail } from "react-icons/hi";
 import { TiTick, TiWarning } from "react-icons/ti";
+import Loading from "@/components/Loading";
+
+const MIN_LOADING_TIME = 2000;
 
 const DashboardPage = () => {
   const { data: session, isPending } = useSession();
+  const [minTimePassed, setMinTimePassed] = useState(false);
 
-  if (isPending) {
+  useEffect(() => {
+    const timer = setTimeout(() => setMinTimePassed(true), MIN_LOADING_TIME);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const showLoading = isPending || !minTimePassed;
+
+  if (showLoading) {
     return (
       <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8 h-screen overflow-y-scroll">
-        <p>Loading...</p>
+        <Loading />
       </main>
     );
   }
