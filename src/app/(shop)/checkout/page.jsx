@@ -581,7 +581,10 @@ const CheckoutPage = () => {
           )}
         </div>
         {/* ================= Products =================== */}
-        <div id="products-list" className="flex flex-col gap-y-5 scroll-mt-24">
+        <div
+          id="products-list"
+          className="flex flex-col gap-y-5 scroll-mt-24  mb-15"
+        >
           <h1 className="text-xl font-semibold">
             Your Product
             <span className="text-red-900"> ( {totalQuantity} )</span>

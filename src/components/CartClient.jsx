@@ -88,7 +88,7 @@ const CartClient = ({ cartItems }) => {
     );
   }
   return (
-    <main className="grid grid-cols-12 gap-8 mt-10 mx-20 ">
+    <main className="grid grid-cols-12 gap-8 mt-10 mx-20 mb-15">
       <h3 className="col-span-12 text-xl font-semibold">
         My Cart ( <span className="text-red-900">{cartItems.length}</span> item
         )

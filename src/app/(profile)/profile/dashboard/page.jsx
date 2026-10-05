@@ -45,7 +45,7 @@ const DashboardPage = () => {
   const location = [user?.city, user?.country].filter(Boolean).join(", ");
 
   return (
-    <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8 h-screen overflow-y-scroll">
+    <main className="col-span-8 pt-10 px-12 flex flex-col gap-y-8 h-screen overflow-y-scroll pb-15">
       <h1 className="text-2xl font-semibold flex gap-4 items-center">
         Dashboard
       </h1>
