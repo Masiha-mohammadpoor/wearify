@@ -22,11 +22,6 @@ const headerLinks = [
     text: "About",
     link: "/about",
   },
-  {
-    id: 4,
-    text: "Contact",
-    link: "/contact",
-  },
 ];
 
 const Header = () => {

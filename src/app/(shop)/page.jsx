@@ -51,13 +51,6 @@ const Home = async () => {
           >
             About
           </Link>
-
-          <Link
-            href="/contact"
-            className="text-[#8e7973] transition hover:text-[#82181a]"
-          >
-            Contact
-          </Link>
         </div>
 
         {/* Right icons */}
