@@ -13,8 +13,14 @@ import { getCachedProducts } from "@/lib/products";
 import NavActions from "@/components/NavActions";
 
 const Home = async () => {
-  const products = await getCachedProducts();
-  const latestProduct = products?.[0] || null;
+  let products = [];
+  try {
+    products = (await getCachedProducts()) || [];
+  } catch (error) {
+    console.error("Failed to load products for homepage:", error.message);
+  }
+
+  const latestProduct = products[0] || null;
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#FDF8F6] text-[#181313]">

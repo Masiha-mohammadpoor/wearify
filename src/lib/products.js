@@ -4,10 +4,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 export const getCachedProducts = unstable_cache(
   async () => {
-    const response = await fetch(`${BASE_URL}/api/products`, {
-      // disable cache
-      cache: "no-store",
-    });
+    const response = await fetch(`${BASE_URL}/api/products`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch products");
@@ -25,10 +22,7 @@ export const getCachedProducts = unstable_cache(
 
 export const getProductById = unstable_cache(
   async (id) => {
-    const response = await fetch(`${BASE_URL}/api/products/${id}`, {
-      // disable cache
-      cache: "no-store",
-    });
+    const response = await fetch(`${BASE_URL}/api/products/${id}`);
 
     if (!response.ok) {
       throw new Error("Product not found");

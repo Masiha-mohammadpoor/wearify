@@ -19,7 +19,7 @@ async function getCategoryName(categoryId) {
           Authorization: `Bearer ${API_KEY}`,
           "Content-Type": "application/json",
         },
-        cache: "no-store",
+        next: { revalidate: 86400 },
       },
     );
 
@@ -49,7 +49,7 @@ export async function GET() {
         Authorization: `Bearer ${API_KEY}`,
         "Content-Type": "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: 3600 },
     });
 
     if (!productsRes.ok) {
@@ -72,7 +72,7 @@ export async function GET() {
                 Authorization: `Bearer ${API_KEY}`,
                 "Content-Type": "application/json",
               },
-              cache: "no-store",
+              next: { revalidate: 3600 },
             },
           );
 
