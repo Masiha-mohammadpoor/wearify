@@ -63,9 +63,9 @@ const DashboardPage = () => {
       </h1>
       {/* dashboard cards */}
       <section className="w-full grid grid-cols-12 gap-8">
-        <DashboardCard title="My Order" value={10} />
-        <DashboardCard title="My Order" value={10} />
-        <DashboardCard title="My Order" value={10} />
+        <DashboardCard title="Total Orders" value={10} />
+        <DashboardCard title="Cart Items" value={5} />
+        <DashboardCard title="Pending Orders" value={3} />{" "}
       </section>
       {/* user info */}
       <section className="relative w-full rounded-xl bg-[#f4ece4] p-10 flex flex-col gap-y-10">
