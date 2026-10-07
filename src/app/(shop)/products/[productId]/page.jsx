@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import ProductPageOptions from "@/components/ProductPageOptions";
 import { getProductById } from "@/lib/products";
 
@@ -6,7 +7,10 @@ const ProductPage = async ({ params }) => {
   const product = await getProductById(productId);
 
   return (
-    <ProductPageOptions product={product}/>
+    <>
+      <Header />
+      <ProductPageOptions product={product} />
+    </>
   );
 };
 

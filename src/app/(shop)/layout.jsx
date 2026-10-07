@@ -1,6 +1,5 @@
 import { Comfortaa } from "next/font/google";
 import "../globals.css";
-import Header from "@/components/Header";
 import ToasterProvider from "@/components/ToasterProvider";
 
 const comfortaa = Comfortaa({
@@ -16,7 +15,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${comfortaa.className} antialiased h-full`}>
       <body className="min-h-full flex flex-col bg-[#FDF8F6]">
-        <Header />
         {children}
         <ToasterProvider />
       </body>
