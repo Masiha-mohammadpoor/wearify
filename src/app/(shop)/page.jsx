@@ -322,7 +322,7 @@ const Home = async () => {
                   </div>
 
                   <span className="shrink-0 text-sm font-semibold text-[#82181a]">
-                    ${latestProduct.price}
+                    €{latestProduct.price}
                   </span>
                 </div>
               </Link>
