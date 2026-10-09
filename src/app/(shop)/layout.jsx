@@ -14,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${comfortaa.className} antialiased h-full`}>
-      <body className="min-h-full flex flex-col bg-[#FDF8F6]">
+      <body className="min-h-full flex flex-col bg-[#FDF8F6] overflow-x-hidden">
         {children}
         <ToasterProvider />
       </body>
