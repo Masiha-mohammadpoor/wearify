@@ -31,6 +31,10 @@ const addressSchema = yup
   .object({
     firstName: yup.string().required("First name is required"),
     lastName: yup.string().required("Last name is required"),
+    email: yup
+      .string()
+      .required("Email is required")
+      .email("Please enter a valid email"),
     phoneNumber: yup
       .string()
       .required("Phone number is required")
@@ -89,6 +93,7 @@ const CheckoutPage = () => {
     defaultValues: {
       firstName: "",
       lastName: "",
+      email: "",
       phoneNumber: "",
       country: "",
       state: "",
@@ -296,6 +301,7 @@ const CheckoutPage = () => {
         ? {
             firstName: session.user.firstName,
             lastName: session.user.lastName,
+            email: session.user.email,
             phoneNumber: session.user.phoneNumber,
             country: session.user.country,
             state: session.user.state || null,
@@ -383,6 +389,10 @@ const CheckoutPage = () => {
                       {session.user.firstName} {session.user.lastName}
                     </p>
                     <div className="text-sm text-gray-600 flex flex-col gap-y-1">
+                      <p className="text-sm text-gray-600">
+                        <span className="text-red-900">email : </span>
+                        {session.user.email.slice(0,20)+"..."}
+                      </p>
                       <p>
                         <span className="text-red-900">address : </span>
                         {session.user.address.slice(0, 20) + "..."}
@@ -454,6 +464,15 @@ const CheckoutPage = () => {
                   style="col-span-6"
                   register={register}
                   error={errors["lastName"]?.message}
+                />
+                <ProfileInput
+                  name="email"
+                  label="Email"
+                  type="email"
+                  placeholder="you@example.com"
+                  style="col-span-6"
+                  register={register}
+                  error={errors["email"]?.message}
                 />
                 <div className="col-span-6">
                   <Controller
