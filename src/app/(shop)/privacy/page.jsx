@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
 
@@ -9,6 +10,8 @@ export const metadata = {
 
 const PrivacyPage = () => {
   return (
+    <>
+    <Header/>
     <main className="min-h-screen bg-[#FDF8F6] text-[#181313] overflow-x-hidden">
       {/* =========================================================
           HEADER
@@ -216,6 +219,7 @@ const PrivacyPage = () => {
         </div>
       </section>
     </main>
+    </>
   );
 };
 

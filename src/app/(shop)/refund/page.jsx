@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
 
@@ -8,6 +9,8 @@ export const metadata = {
 
 const RefundPage = () => {
   return (
+    <>
+    <Header/>
     <main className="min-h-screen bg-[#FDF8F6] text-[#181313]">
       {/* =========================================================
           HEADER
@@ -217,6 +220,7 @@ const RefundPage = () => {
         </div>
       </section>
     </main>
+    </>
   );
 };
 
