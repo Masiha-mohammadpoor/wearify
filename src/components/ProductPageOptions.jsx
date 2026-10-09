@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { BiDollar } from "react-icons/bi";
+import { LuEuro } from "react-icons/lu";
 import SizeSelector from "./SizeSelector";
 import ColorSwatches from "./ColorSwatches";
 import AddToCartButton from "./AddToCartButton";
@@ -88,7 +88,7 @@ const ProductPageOptions = ({ product }) => {
           />
         </div>
         <div className="font-semibold text-3xl flex items-start">
-          <BiDollar className="text-red-900 text-3xl" /> {displayPrice}
+          <LuEuro className="text-red-900 text-3xl" /> {displayPrice}
         </div>
         <AddToCartButton
           variantId={variantId}

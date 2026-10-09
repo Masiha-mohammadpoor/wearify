@@ -50,8 +50,8 @@ const PriceRangeSlider = ({
   return (
     <div className="w-full max-w-sm">
       <div className="flex justify-between mb-2 text-sm font-medium text-gray-700">
-        <span>${minVal}</span>
-        <span>${maxVal}</span>
+        <span>€{minVal}</span>
+        <span>€{maxVal}</span>
       </div>
 
       <div className="relative h-2">

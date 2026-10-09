@@ -9,7 +9,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BiDollar } from "react-icons/bi";
+import { LuEuro } from "react-icons/lu";
 import { FaMinus, FaPlus, FaTrashCan } from "react-icons/fa6";
 import toast from "react-hot-toast";
 
@@ -115,7 +115,7 @@ const CartClient = ({ cartItems }) => {
                 <div className="flex flex-col justify-between h-30 py-2">
                   <h4 className="font-semibold text-lg">{item.name}</h4>
                   <span className="font-semibold flex items-center gap-x-0.5">
-                    <BiDollar className="text-red-900 mb-1.5" /> {item.price}
+                    <LuEuro className="text-red-900 mb-1.5" /> {item.price}
                   </span>
                   <div className="flex items-center gap-x-3">
                     <div className="flex items-center gap-x-1">
@@ -192,7 +192,7 @@ const CartClient = ({ cartItems }) => {
         <div className="flex justify-between text-gray-700">
           <span>Items ({totalQuantity})</span>
           <span className="flex items-center">
-            <BiDollar className="text-red-900 mb-1" />
+            <LuEuro className="text-red-900 mb-1" />
             {subtotal.toFixed(2)}
           </span>
         </div>
@@ -212,7 +212,7 @@ const CartClient = ({ cartItems }) => {
         <div className="flex justify-between text-lg font-semibold">
           <span>Total</span>
           <span className="flex items-center">
-            <BiDollar className="text-red-900 mb-1.5" />
+            <LuEuro className="text-red-900 mb-1.5" />
             {subtotal.toFixed(2)}
           </span>
         </div>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { FaStar } from "react-icons/fa6";
-import { BiDollar } from "react-icons/bi";
+import { LuEuro } from "react-icons/lu";
 import Link from "next/link";
 
 const ProductCard = ({ product: { id, name, price, category, image }}) => {
@@ -29,7 +29,7 @@ const ProductCard = ({ product: { id, name, price, category, image }}) => {
         <h3 className="mt-3 text-[16px]">{name}</h3>
         <div className="mt-4 w-full flex justify-between items-end pb-1">
           <span className="font-semibold text-lg flex items-center gap-x-0.5">
-            <BiDollar className="text-red-900" /> {price}
+            <LuEuro className="text-red-900 mb-1" /> {price}
           </span>
           <Link href={`/products/${id}`}>
             <button className="bg-red-900 py-1 px-1.5 rounded-xl text-white text-sm cursor-pointer flex items-center justify-center gap-x-1">see product</button>

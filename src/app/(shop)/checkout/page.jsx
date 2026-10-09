@@ -12,7 +12,7 @@ import {
   removeProductFromCart,
   updateProductQuantity,
 } from "@/services/cartServices";
-import { BiDollar } from "react-icons/bi";
+import { LuEuro } from "react-icons/lu";
 import { FaMinus, FaPlus, FaTrashCan } from "react-icons/fa6";
 import { LuMapPin, LuPlus, LuTruck } from "react-icons/lu";
 import ProfileInput from "@/components/ProfileInput";
@@ -598,7 +598,7 @@ const CheckoutPage = () => {
                       </span>
                     </span>
                     <span className="font-semibold flex items-center">
-                      <BiDollar className="text-red-900" />
+                      <LuEuro className="text-red-900" />
                       {rate.rate}
                     </span>
                   </label>
@@ -635,7 +635,7 @@ const CheckoutPage = () => {
                     <div className="flex flex-col justify-between h-24 py-1">
                       <h4 className="font-semibold text-lg">{item.name}</h4>
                       <span className="font-semibold flex items-center gap-x-0.5">
-                        <BiDollar className="text-red-900 mb-1.5" />
+                        <LuEuro className="text-red-900 mb-1.5" />
                         {item.price}
                       </span>
                       <div className="flex items-center gap-x-3 text-sm">
@@ -704,7 +704,7 @@ const CheckoutPage = () => {
           <div className="flex justify-between text-gray-700">
             <span>Items ({totalQuantity})</span>
             <span className="flex items-center">
-              <BiDollar className="text-red-900 mb-1" />
+              <LuEuro className="text-red-900 mb-1" />
               {subtotal.toFixed(2)}
             </span>
           </div>
@@ -719,7 +719,7 @@ const CheckoutPage = () => {
             <span className="flex items-center">
               {selectedRate ? (
                 <>
-                  <BiDollar className="text-red-900 mb-1" />
+                  <LuEuro className="text-red-900 mb-1" />
                   {shippingCost.toFixed(2)}
                 </>
               ) : (
@@ -733,7 +733,7 @@ const CheckoutPage = () => {
           <div className="flex justify-between text-lg font-semibold">
             <span>Total</span>
             <span className="flex items-center">
-              <BiDollar className="text-red-900 mb-1.5" />
+              <LuEuro className="text-red-900 mb-1.5" />
               {total.toFixed(2)}
             </span>
           </div>

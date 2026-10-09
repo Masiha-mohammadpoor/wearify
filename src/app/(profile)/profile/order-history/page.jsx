@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BiDollar } from "react-icons/bi";
+import { LuEuro } from "react-icons/lu";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaBox } from "react-icons/fa6";
 
@@ -41,7 +41,7 @@ const OrderHistory = () => {
               </div>
               <div className="flex items-center gap-x-4">
                 <p className="flex items-center text-xl">
-                  <BiDollar className="text-red-900 mb-1.25" /> 35
+                  <LuEuro className="text-red-900 mb-1.25" /> 35
                 </p>
                 <Link
                   href="/products"
@@ -56,8 +56,8 @@ const OrderHistory = () => {
               <h3 className="text-[#8e7973] flex items-center gap-x-2 text-lg">
                 <FaBox className="mb-1" /> Delivered
               </h3>
-              <p className="text-lg flex items-center font-semibold">
-                Total : <BiDollar className="mb-1" /> 90
+              <p className="flex items-center font-semibold">
+                Total : <LuEuro className="mb-1.5" /> 90
               </p>
             </div>
           </div>
